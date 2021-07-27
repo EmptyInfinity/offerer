@@ -31,6 +31,7 @@ export default (schema: Joi.ObjectSchema, source: ValidationSource = ValidationS
   req: Request,
   res: Response,
   next: NextFunction,
+// eslint-disable-next-line consistent-return
 ) => {
   try {
     const { error } = schema.validate(req[source]);

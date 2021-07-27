@@ -12,6 +12,7 @@ export default interface User extends Document {
   status?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+// eslint-disable-next-line semi
 }
 
 const schema = new Schema(

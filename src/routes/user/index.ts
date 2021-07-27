@@ -9,6 +9,7 @@ import schema from './schema';
 import asyncHandler from '../../helpers/asyncHandler';
 import authentication from '../../auth/authentication';
 
+const b = 4;
 const router = express.Router();
 
 router.get(

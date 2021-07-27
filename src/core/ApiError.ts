@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { Response } from 'express';
 import { environment } from '../config';
 import {

@@ -1,9 +1,10 @@
+/* eslint-disable consistent-return */
 import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import Logger from './core/Logger';
 import { corsUrl, environment } from './config';
-import './database'; // initialize database
+// import './database'; // initialize database
 import { NotFoundError, ApiError, InternalError } from './core/ApiError';
 import routes from './routes';
 
@@ -24,7 +25,6 @@ app.use('/v1', routes);
 app.use((req, res, next) => next(new NotFoundError()));
 
 // Middleware Error Handler
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof ApiError) {
     ApiError.handle(err, res);

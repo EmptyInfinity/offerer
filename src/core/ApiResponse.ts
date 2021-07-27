@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { Response } from 'express';
 
 // Helper code for the API consumer to understand the error and handle is accordingly
@@ -18,10 +19,12 @@ enum ResponseStatus {
 }
 
 abstract class ApiResponse {
+  // eslint-disable-next-line no-useless-constructor
   constructor(
     protected statusCode: StatusCode,
     protected status: ResponseStatus,
     protected message: string,
+  // eslint-disable-next-line no-empty-function
   ) {}
 
   protected prepare<T extends ApiResponse>(res: Response, response: T): Response {
@@ -37,6 +40,7 @@ abstract class ApiResponse {
     Object.assign(clone, response);
     // @ts-ignore
     delete clone.status;
+    // eslint-disable-next-line
     for (const i in clone) if (typeof clone[i] === 'undefined') delete clone[i];
     return clone;
   }

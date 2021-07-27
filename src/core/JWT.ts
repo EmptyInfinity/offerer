@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file, no-irregular-whitespace,  no-tabs  */
 import path from 'path';
 import { readFile } from 'fs';
 import { promisify } from 'util';

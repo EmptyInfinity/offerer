@@ -47,6 +47,7 @@ export default class UserRepo {
   ): Promise<User> {
     const now = new Date();
 
+    // eslint-disable-next-line
     user.createdAt = user.updatedAt = now;
     const createdUser = await UserModel.create(user);
     return createdUser.toObject();

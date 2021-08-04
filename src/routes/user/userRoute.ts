@@ -4,7 +4,7 @@ import UserService from '../../services/UserService';
 import validator, { ValidationSource } from '../../helpers/validator';
 import schema from './userSchema';
 import asyncHandler from '../../helpers/asyncHandler';
-import { User } from '../../databases/mongodb/models/User';
+import { IUser } from '../../databases/interfaces';
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ router.post(
   '/',
   validator(schema.body, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    const userData: User = req.body;
+    const userData: IUser = req.body;
     const user = await UserService.createOne(userData);
     return SuccessResponse(res, 200, user);
   }),
@@ -40,7 +40,7 @@ router.put(
   validator(schema.id, ValidationSource.PARAM),
   validator(schema.body, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    const userData: User = req.body;
+    const userData: IUser = req.body;
     await UserService.updateOne(req.params.id, userData);
     return SuccessResponse(res, 200);
   }),

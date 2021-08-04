@@ -3,11 +3,14 @@ import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import Logger from './handlers/Logger';
-import { corsUrl, environment } from './config';
-import { connectDB } from './databases/mongodb'; // initialize database
+import { corsUrl, environment, dbDir } from './config';
+
 import { NotFoundError, ApiError, InternalError } from './handlers/ApiError';
 import routes from './routes';
 
+const dbPath = `./databases/${dbDir}`;
+// eslint-disable-next-line import/no-dynamic-require
+const { connectDB } = require(dbPath);
 connectDB();
 
 process.on('uncaughtException', (err) => {

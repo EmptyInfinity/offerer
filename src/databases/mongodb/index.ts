@@ -18,7 +18,8 @@ const options = {
   socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
 };
 
-export const isValidId = (id: string) => mongoose.Types.ObjectId.isValid(id);
+export const isValidId = (id: string) => mongoose.isValidObjectId(id);
+export const isDbError = (error: any) => error.name === 'MongoError';
 
 Logger.debug(dbURI);
 

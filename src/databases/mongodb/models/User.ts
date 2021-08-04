@@ -1,11 +1,11 @@
 import { model, Schema, Document } from 'mongoose';
 import { USER_ROLE } from '../../../config';
+import { IUser } from '../../interfaces';
 
 const { Types } = Schema;
 export const DOCUMENT_NAME = 'User';
 export const COLLECTION_NAME = 'users';
-
-export interface User extends Document {
+export interface UserDocument extends IUser, Document {
   name: string;
   email: string;
   password?: string;
@@ -48,5 +48,12 @@ schema.set('toJSON', {
     delete ret.__v;
   },
 });
+schema.post('save', (error: any, { email }: UserDocument, next: any) => {
+  if (error.name === 'MongoError' && error.code === 11000) {
+    next(new Error(`Email "${email}" is already in use!`));
+  } else {
+    next();
+  }
+});
 
-export const UserModel = model<User>(DOCUMENT_NAME, schema, COLLECTION_NAME);
+export const UserModel = model<UserDocument>(DOCUMENT_NAME, schema, COLLECTION_NAME);

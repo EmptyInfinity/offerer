@@ -4,7 +4,6 @@ import { config } from 'dotenv';
 config();
 export const environment = process.env.NODE_ENV;
 export const port = process.env.PORT;
-export const db = process.env.DB;
 export const dbDir = process.env.DB_DIR;
 
 export const dbConfig = {

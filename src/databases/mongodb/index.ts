@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
-import Logger from '../handlers/Logger';
-import { db } from '../config';
+import Logger from '../../handlers/Logger';
+import { dbConfig } from '../../config';
 
 // Build the connection string
-const dbURI = `mongodb+srv://${db.user}:${encodeURIComponent(db.password)}@${db.host}/${db.name}`;
+const dbURI = `mongodb+srv://${dbConfig.user}:${encodeURIComponent(dbConfig.password)}@${dbConfig.host}/${dbConfig.name}`;
 
 const options = {
   useNewUrlParser: true,
@@ -17,6 +17,8 @@ const options = {
   connectTimeoutMS: 10000, // Give up initial connection after 10 seconds
   socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
 };
+
+export const isValidId = (id: string) => mongoose.Types.ObjectId.isValid(id);
 
 Logger.debug(dbURI);
 

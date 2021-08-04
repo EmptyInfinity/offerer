@@ -1,6 +1,6 @@
 import { NotFoundError } from '../handlers/ApiError';
-import { User } from '../database/models/User';
-import UserApi from '../database/api/UserApi';
+import { User } from '../databases/mongodb/models/User';
+import UserApi from '../databases/mongodb/api/UserApi';
 
 export default class UserService {
   public static async getById(id: any): Promise<User | null> {

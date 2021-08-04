@@ -1,13 +1,9 @@
 import { model, Schema, Document } from 'mongoose';
+import { USER_ROLE } from '../../../config';
 
 const { Types } = Schema;
 export const DOCUMENT_NAME = 'User';
 export const COLLECTION_NAME = 'users';
-export enum USER_ROLE {
-  admin = 'admin',
-  user = 'user',
-  customer = 'customer'
-}
 
 export interface User extends Document {
   name: string;

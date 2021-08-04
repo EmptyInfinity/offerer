@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import Logger from './handlers/Logger';
 import { corsUrl, environment } from './config';
-import { connectDB } from './database'; // initialize database
+import { connectDB } from './databases/mongodb'; // initialize database
 import { NotFoundError, ApiError, InternalError } from './handlers/ApiError';
 import routes from './routes';
 

@@ -1,11 +1,9 @@
 import mongoose from 'mongoose';
-import Logger from '../core/Logger';
+import Logger from '../handlers/Logger';
 import { db } from '../config';
 
 // Build the connection string
-const dbURI = `mongodb://${db.user}:${encodeURIComponent(db.password)}@${db.host}:${db.port}/${
-  db.name
-}`;
+const dbURI = `mongodb+srv://${db.user}:${encodeURIComponent(db.password)}@${db.host}/${db.name}`;
 
 const options = {
   useNewUrlParser: true,
@@ -23,7 +21,7 @@ const options = {
 Logger.debug(dbURI);
 
 // Create the database connection
-mongoose
+export const connectDB = () => mongoose
   .connect(dbURI, options)
   .then(() => {
     Logger.info('Mongoose connection done');

@@ -1,4 +1,4 @@
-import Logger from './core/Logger';
+import Logger from './handlers/Logger';
 import { port } from './config';
 import app from './app';
 

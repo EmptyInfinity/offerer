@@ -1,72 +1,28 @@
-import { Types } from 'mongoose';
-import User, { UserModel } from '../database/models/User';
+import { NotFoundError } from '../handlers/ApiError';
+import { User } from '../database/models/User';
+import UserApi from '../database/api/UserApi';
 
-export default class UserRepo {
-  // contains critical information of the user
-  public static findById(id: Types.ObjectId): Promise<User | null> {
-    return UserModel.findOne({ _id: id, status: true })
-      .select('+email +password +roles')
-      .populate({
-        path: 'roles',
-        match: { status: true },
-      })
-      .lean<User>()
-      .exec();
-  }
-
-  public static findByEmail(email: string): Promise<User | null> {
-    return UserModel.findOne({ email, status: true })
-      .select('+email +password +roles')
-      .populate({
-        path: 'roles',
-        match: { status: true },
-        select: { code: 1 },
-      })
-      .lean<User>()
-      .exec();
-  }
-
-  public static findProfileById(id: Types.ObjectId): Promise<User | null> {
-    return UserModel.findOne({ _id: id, status: true })
-      .select('+roles')
-      .populate({
-        path: 'roles',
-        match: { status: true },
-        select: { code: 1 },
-      })
-      .lean<User>()
-      .exec();
-  }
-
-  public static findPublicProfileById(id: Types.ObjectId): Promise<User | null> {
-    return UserModel.findOne({ _id: id, status: true }).lean<User>().exec();
-  }
-
-  public static async create(
-    user: User,
-  ): Promise<User> {
-    const now = new Date();
-
-    // eslint-disable-next-line
-    user.createdAt = user.updatedAt = now;
-    const createdUser = await UserModel.create(user);
-    return createdUser.toObject();
-  }
-
-  public static async update(
-    user: User,
-  ): Promise<User> {
-    user.updatedAt = new Date();
-    await UserModel.updateOne({ _id: user._id }, { $set: { ...user } })
-      .lean()
-      .exec();
+export default class UserService {
+  public static async getById(id: any): Promise<User | null> {
+    const user = await UserApi.getById(id);
+    if (!user) throw new NotFoundError('User not found!');
     return user;
   }
 
-  public static updateInfo(user: User): Promise<any> {
-    user.updatedAt = new Date();
-    return UserModel.updateOne({ _id: user._id }, { $set: { ...user } })
-      .lean()
-      .exec();
+  public static async getAll(): Promise<User[]> {
+    return UserApi.getAll();
+  }
+
+  public static async createOne(userData: User): Promise<User> {
+    userData.password = 'new secure password';
+    return UserApi.createOne(userData);
+  }
+
+  public static async updateOne(id: any, userData: User): Promise<any> {
+    return UserApi.updateOne(id, userData);
+  }
+
+  public static async deleteOne(id: any) {
+    return UserApi.deleteOne(id);
   }
 }

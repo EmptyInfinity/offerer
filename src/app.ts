@@ -2,11 +2,13 @@
 import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import Logger from './core/Logger';
+import Logger from './handlers/Logger';
 import { corsUrl, environment } from './config';
-// import './database'; // initialize database
-import { NotFoundError, ApiError, InternalError } from './core/ApiError';
+import { connectDB } from './database'; // initialize database
+import { NotFoundError, ApiError, InternalError } from './handlers/ApiError';
 import routes from './routes';
+
+connectDB();
 
 process.on('uncaughtException', (err) => {
   Logger.error(err);

@@ -1,30 +1,23 @@
 import express from 'express';
-// import apikey from '../../auth/apikey';
-// import signup from './access/signup';
-// import login from './access/login';
-// import logout from './access/logout';
-// import token from './access/token';
-// import blogList from './blog/blogList';
-// import blogDetail from './blog/blogDetail';
-// import writer from './blog/writer';
-// import editor from './blog/editor';
-import user from './user/userRoute';
+import fs from 'fs';
+import path from 'path';
+import Logger from '../handlers/Logger';
+import { isDir, worldToPlural } from '../helpers';
 
 const router = express.Router();
 
-/*-------------------------------------------------------------------------*/
-// Below all APIs are public APIs protected by api-key
-// router.use('/', apikey);
-/*-------------------------------------------------------------------------*/
+export default async () => {
+  try {
+    const filesAndDirs = await fs.readdirSync(path.join(__dirname, '../routes'));
+    filesAndDirs.forEach(async (item) => {
+      if (!isDir(item)) return;
+      const route = `/${worldToPlural(item)}`;
+      const { default: routeHandler } = await import(`./${item}/${item}Route`);
+      router.use(route, routeHandler);
+    });
+  } catch (err) {
+    Logger.error(err);
+  }
 
-// router.use('/signup', signup);
-// router.use('/login', login);
-// router.use('/logout', logout);
-// router.use('/token', token);
-// router.use('/blogs', blogList);
-// router.use('/blog', blogDetail);
-// router.use('/writer/blog', writer);
-// router.use('/editor/blog', editor);
-router.use('/users', user);
-
-export default router;
+  return router;
+};

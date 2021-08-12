@@ -32,6 +32,7 @@ module.exports = {
     'no-return-assign': 0,
     'no-prototype-builtins': 0,
     'operator-linebreak': 0,
+    radix: 0,
     // 'no-extra-semi': 0,
   },
   settings: {

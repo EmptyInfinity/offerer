@@ -15,18 +15,28 @@ export enum ValidationSource {
   PARAM = 'params',
 }
 
-export const id = () => Joi.string().custom((value: string, helpers) => {
+export const JoiValidId = () => Joi.string().custom((value: string, helpers) => {
   if (!isValidId(value)) return helpers.error('any.invalid');
   return value;
 }, 'Object Id Validation');
 
-export default (schema: Joi.ObjectSchema, source: ValidationSource = ValidationSource.BODY) => (
+export const validateId = (value: any) => {
+  if (!isValidId(value)) throw new Error('Invalid id format');
+};
+
+export default (schema?: Joi.ObjectSchema, source: ValidationSource = ValidationSource.BODY) => (
   req: Request,
   res: Response,
   next: NextFunction,
 // eslint-disable-next-line consistent-return
 ) => {
   try {
+    if (source === 'params') {
+      const ids = Object.keys(req.params);
+      ids.forEach((id) => validateId(req.params[id]));
+      return next();
+    }
+
     const { error } = schema.validate(req[source]);
     if (!error) return next();
 

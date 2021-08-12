@@ -5,12 +5,7 @@ import { IUser } from '../../interfaces';
 const { Types } = Schema;
 export const DOCUMENT_NAME = 'User';
 export const COLLECTION_NAME = 'users';
-export interface UserDocument extends IUser, Document {
-  name: string;
-  email: string;
-  password?: string;
-  role: USER_ROLE
-}
+export interface UserDocument extends IUser, Document {}
 
 const schema = new Schema(
   {
@@ -25,6 +20,7 @@ const schema = new Schema(
       required: true,
       unique: true,
       trim: true,
+      maxlength: 100,
     },
     password: {
       type: Types.String,
@@ -36,17 +32,22 @@ const schema = new Schema(
       required: true,
       enum: Object.values(USER_ROLE),
     },
+    company: {
+      type: Types.ObjectId,
+      ref: 'Company',
+    },
+    offers: [{
+      type: Types.ObjectId,
+      ref: 'Offer',
+    }],
   },
   {
     versionKey: false,
   },
 );
 schema.set('toJSON', {
-  transform(doc, ret, options) {
-    ret.id = ret._id;
-    delete ret._id;
-    delete ret.__v;
-  },
+  virtuals: true,
+  transform(doc, ret) { delete ret._id; },
 });
 schema.post('save', (error: any, { email }: UserDocument, next: any) => {
   if (error.name === 'MongoError' && error.code === 11000) {

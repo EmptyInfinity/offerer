@@ -20,6 +20,12 @@ const options = {
 
 export const isValidId = (id: string) => mongoose.isValidObjectId(id);
 export const isDbError = (error: any) => error.name === 'MongoError';
+export const normalized = (data: any) => {
+  if (!data) return undefined;
+  data.id = data._id;
+  delete data._id;
+  return data;
+};
 
 Logger.debug(dbURI);
 

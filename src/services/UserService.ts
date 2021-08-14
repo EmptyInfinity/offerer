@@ -1,11 +1,13 @@
 /* eslint-disable import/no-dynamic-require */
-import { NotFoundError } from '../handlers/ApiError';
+import { genSalt, hash } from 'bcrypt';
+import { NotFoundError, ForbiddenError } from '../handlers/ApiError';
 import { dbDir } from '../config';
 import { IOffer, IUser } from '../databases/interfaces';
-import OfferService from './OfferService';
 
 const dbPath = `../databases/${dbDir}`;
 const { default: UserApi } = require(`${dbPath}/api/UserApi`);
+const { default: OfferApi } = require(`${dbPath}/api/OfferApi`);
+const { default: CompanyInviteApi } = require(`${dbPath}/api/CompanyInviteApi`);
 
 export default class UserService {
   /* CRUD */
@@ -20,14 +22,9 @@ export default class UserService {
   }
 
   public static async createOne(userData: IUser): Promise<IUser> {
-    userData.password = 'new secure password';
-    const user = await UserApi.createOne({ ...userData, offers: [] });
-    const savedOffersIds: any[] = [];
-    const { offers } = userData;
-    await Promise.all(offers.map(async (offer: IOffer) => {
-      const { id } = await OfferService.createOne(offer);
-      savedOffersIds.push(id);
-    }));
+    const password = await this.hashPassword(userData.password);
+    const user = await UserApi.createOne({ ...userData, password, offers: [] });
+    const savedOffersIds: any[] = await this.saveUserOffers(userData.offers);
     return UserApi.updateById(user.id, { offers: savedOffersIds });
   }
 
@@ -40,13 +37,36 @@ export default class UserService {
   }
   /* CRUD END */
 
+  public static async getUserByEmailWithPassword(email: string): Promise<IUser | undefined> {
+    return UserApi.getUserByEmailWithPassword(email);
+  }
+
   public static deleteAll(): Promise<any> {
     return UserApi.deleteAll();
   }
 
-  public static joinCompany(userId: any, companyId: any): Promise<any> {
-    // here should be validation. There is should be a collection "Invites", where are
-    // invitations are stored. If user has invitation to company => validation passed
+  public static async joinCompany(userId: any, companyId: any): Promise<any> {
+    const invite = await CompanyInviteApi.getOne({ user: userId, company: companyId });
+    if (!invite) throw new ForbiddenError();
+    await CompanyInviteApi.deleteById(invite.id);
     return UserApi.joinCompany(userId, companyId);
+  }
+
+  public static async leaveCompany(userId: any): Promise<any> {
+    return UserApi.updateById(userId, { company: null });
+  }
+
+  private static async hashPassword(password: string): Promise<string> {
+    const salt = await genSalt(10);
+    return hash(password, salt);
+  }
+
+  private static async saveUserOffers(offers: IOffer[]): Promise<any[]> {
+    const savedOffersIds: any[] = [];
+    await Promise.all(offers.map(async (offer: IOffer) => {
+      const { id } = await OfferApi.createOne(offer);
+      savedOffersIds.push(id);
+    }));
+    return savedOffersIds;
   }
 }

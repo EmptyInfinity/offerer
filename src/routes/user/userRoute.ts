@@ -3,8 +3,11 @@ import { SuccessResponse } from '../../handlers/ApiResponse';
 import UserService from '../../services/UserService';
 import validator, { ValidationSource } from '../../helpers/validator';
 import schema from './userSchema';
-import asyncHandler from '../../helpers/asyncHandler';
 import { IUser } from '../../databases/interfaces';
+import { createToken } from '../../helpers';
+import verifyToken from '../../helpers/verifyToken';
+import asyncHandler from '../../helpers/asyncHandler';
+import Accessor from '../../helpers/Accessor';
 
 const router = express.Router();
 
@@ -13,8 +16,9 @@ router.post(
   '/',
   validator(schema.post, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    const userData: IUser = req.body;
-    const user = await UserService.createOne(userData);
+    const user = await UserService.createOne(req.body);
+    const token = createToken(user.id);
+    res.set({ 'auth-token': token });
     return SuccessResponse(res, 200, user);
   }),
 );
@@ -37,21 +41,19 @@ router.get(
 );
 
 router.put(
-  '/:id',
-  validator(null, ValidationSource.PARAM),
+  '/',
+  verifyToken,
   validator(schema.put, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    const userData: IUser = req.body;
-    await UserService.updateById(req.params.id, userData);
+    await UserService.updateById(req.user.id, req.body);
     return SuccessResponse(res, 200);
   }),
 );
 
 router.delete(
-  '/:id',
-  validator(null, ValidationSource.PARAM),
+  '/',
   asyncHandler(async (req: Request, res: Response) => {
-    await UserService.deleteById(req.params.id);
+    await UserService.deleteById(req.user.id);
     return SuccessResponse(res, 200);
   }),
 );
@@ -66,10 +68,23 @@ router.delete(
 );
 
 router.post(
-  '/:userId/companies/:companyId/join',
+  '/joinCompany/:companyId',
+  verifyToken,
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
-    await UserService.joinCompany(req.params.userId, req.params.companyId);
+    Accessor.canUserJoinCompany(req);
+    await UserService.joinCompany(req.user.id, req.params.companyId);
+    return SuccessResponse(res, 200);
+  }),
+);
+
+router.post(
+  '/leaveCompany',
+  verifyToken,
+  validator(null, ValidationSource.PARAM),
+  asyncHandler(async (req: Request, res: Response) => {
+    Accessor.canUserLeaveCompany(req);
+    await UserService.leaveCompany(req.user.id);
     return SuccessResponse(res, 200);
   }),
 );

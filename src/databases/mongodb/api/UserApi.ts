@@ -6,8 +6,7 @@ import { normalized } from '../index';
 export default class UserDbApi {
   /* CRUD */
   public static createOne(userData: IUser): Promise<IUser> {
-    const user = new UserModel(userData);
-    return UserModel.create(user);
+    return UserModel.create(userData);
   }
 
   public static async getById(id: Types.ObjectId): Promise<IUser | undefined> {
@@ -35,11 +34,12 @@ export default class UserDbApi {
     return UserModel.deleteMany({}).exec();
   }
 
-  // public static inviteToCompany(userId: Types.ObjectId, companyId: Types.ObjectId): Promise<any> {
-  // return UserModel.findByIdAndUpdate(userId, { $set: { company: companyId } }).exec();
-  // }
-
   public static joinCompany(userId: Types.ObjectId, companyId: Types.ObjectId): Promise<any> {
     return UserModel.findByIdAndUpdate(userId, { $set: { company: companyId } }).exec();
+  }
+
+  public static async getUserByEmailWithPassword(email: string): Promise<IUser | undefined> {
+    const user: IUser | undefined = await UserModel.findOne({ email }).lean<IUser>().select('+password');
+    return normalized(user);
   }
 }

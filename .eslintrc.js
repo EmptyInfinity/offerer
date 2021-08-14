@@ -33,6 +33,7 @@ module.exports = {
     'no-prototype-builtins': 0,
     'operator-linebreak': 0,
     radix: 0,
+    eqeqeq: 0,
     // 'no-extra-semi': 0,
   },
   settings: {

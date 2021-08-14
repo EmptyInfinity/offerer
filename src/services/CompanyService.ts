@@ -1,10 +1,11 @@
+/* eslint-disable import/no-dynamic-require */
 import { NotFoundError } from '../handlers/ApiError';
 import { dbDir } from '../config';
-import { ICompany } from '../databases/interfaces';
+import { ICompany, ICompanyInvite } from '../databases/interfaces';
 
 const dbPath = `../databases/${dbDir}`;
-// eslint-disable-next-line import/no-dynamic-require
-const CompanyApi = require(`${dbPath}/api/CompanyApi`).default;
+const { default: CompanyApi } = require(`${dbPath}/api/CompanyApi`);
+const { default: CompanyInviteApi } = require(`${dbPath}/api/CompanyInviteApi`);
 
 export default class CompanyService {
   /* CRUD */
@@ -30,4 +31,8 @@ export default class CompanyService {
     return CompanyApi.deleteById(id);
   }
   /* CRUD END */
+
+  public static inviteUserToCompany(userId: any, companyId:any): Promise<ICompanyInvite> {
+    return CompanyInviteApi.createOne({ userId, companyId });
+  }
 }

@@ -23,3 +23,9 @@ export interface IOffer {
   price: number
   description?: string
 }
+
+export interface ICompanyInvite {
+  id?: any
+  user: any | IUser
+  company: any | ICompany
+}

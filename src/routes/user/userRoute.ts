@@ -4,7 +4,6 @@ import UserService from '../../services/UserService';
 import validator, { ValidationSource } from '../../helpers/validator';
 import schema from './userSchema';
 import { IUser } from '../../databases/interfaces';
-import { createToken } from '../../helpers';
 import verifyToken from '../../helpers/verifyToken';
 import asyncHandler from '../../helpers/asyncHandler';
 import Accessor from '../../helpers/Accessor';
@@ -16,8 +15,7 @@ router.post(
   '/',
   validator(schema.post, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    const user = await UserService.createOne(req.body);
-    const token = createToken(user.id);
+    const { user, token } = await UserService.createOne(req.body);
     res.set({ 'auth-token': token });
     return SuccessResponse(res, 200, user);
   }),

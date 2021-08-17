@@ -3,6 +3,7 @@ import { genSalt, hash } from 'bcrypt';
 import { NotFoundError, ForbiddenError } from '../handlers/ApiError';
 import { dbDir } from '../config';
 import { IOffer, IUser } from '../databases/interfaces';
+import { createToken } from '../helpers';
 
 const dbPath = `../databases/${dbDir}`;
 const { default: UserApi } = require(`${dbPath}/api/UserApi`);
@@ -21,11 +22,14 @@ export default class UserService {
     return UserApi.getAll();
   }
 
-  public static async createOne(userData: IUser): Promise<IUser> {
+  public static async createOne(userData: IUser): Promise<{user:IUser, token: string}> {
     const password = await this.hashPassword(userData.password);
-    const user = await UserApi.createOne({ ...userData, password, offers: [] });
+    const insertedUser = await UserApi.createOne({ ...userData, password, offers: [] });
     const savedOffersIds: any[] = await this.saveUserOffers(userData.offers);
-    return UserApi.updateById(user.id, { offers: savedOffersIds });
+    const updatedUser = await UserApi.updateById(insertedUser.id, { offers: savedOffersIds });
+    console.log(typeof updatedUser.id, updatedUser.id);
+    const token = createToken(updatedUser.id);
+    return { user: updatedUser, token };
   }
 
   public static updateById(id: any, userData: IUser): Promise<IUser | null> {

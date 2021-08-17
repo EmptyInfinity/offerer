@@ -1,12 +1,11 @@
 /* eslint-disable consistent-return */
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import Logger from './handlers/Logger';
-import { corsUrl, environment } from './config';
-
-import { NotFoundError, ApiError, InternalError } from './handlers/ApiError';
+import { corsUrl } from './config';
+import { NotFoundError } from './handlers/ApiError';
 import getRoutes from './routes';
+import errorMiddleware from './helpers/errorMiddleware';
 
 const app = express();
 
@@ -17,23 +16,13 @@ export default async () => {
 
   // Routes
   const routes = await getRoutes();
-  app.use('/v1', routes);
+  app.use('/', routes);
 
   // catch 404 and forward to error handler
   app.use((req, res, next) => next(new NotFoundError()));
 
   // Middleware Error Handler
-  app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    if (err instanceof ApiError) {
-      ApiError.handle(err, res);
-    } else {
-      if (environment === 'development') {
-        Logger.error(err);
-        return res.status(500).send(err.message);
-      }
-      ApiError.handle(new InternalError(), res);
-    }
-  });
+  app.use(errorMiddleware);
 
   return app;
 };

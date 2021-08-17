@@ -1,7 +1,6 @@
 import { createLogger, transports, format } from 'winston';
 import fs from 'fs';
 import path from 'path';
-import DailyRotateFile from 'winston-daily-rotate-file';
 import { environment, logDirectory } from '../config';
 
 let dir = logDirectory;
@@ -39,6 +38,5 @@ export default createLogger({
       format: format.combine(format.errors({ stack: true }), format.prettyPrint()),
     }),
   ],
-  exceptionHandlers: [new DailyRotateFile(options.file)],
   exitOnError: false, // do not exit on handled exceptions
 });

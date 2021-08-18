@@ -6,7 +6,7 @@ export interface IUser {
   email: string
   password?: string
   role: USER_ROLE
-  company: any | ICompany,
+  company?: any | ICompany,
   offers: any | IOffer[]
 }
 

@@ -12,7 +12,7 @@ const app = express();
 export default async () => {
   app.use(bodyParser.json({ limit: '10mb' }));
   app.use(bodyParser.urlencoded({ limit: '10mb', extended: true, parameterLimit: 50000 }));
-  app.use(cors({ origin: corsUrl, optionsSuccessStatus: 200 }));
+  app.use(cors());
 
   // Routes
   const routes = await getRoutes();

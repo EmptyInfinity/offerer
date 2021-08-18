@@ -9,7 +9,7 @@ const router = express.Router();
 
 export default async () => {
   try {
-    // meta routes
+  // meta routes
     const filesAndDirs = await fs.readdirSync(path.join(__dirname, '../routes'));
     filesAndDirs.forEach(async (item) => {
       if (!isDir(item)) return;

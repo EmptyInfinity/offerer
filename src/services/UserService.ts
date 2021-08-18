@@ -27,7 +27,6 @@ export default class UserService {
     const insertedUser = await UserApi.createOne({ ...userData, password, offers: [] });
     const savedOffersIds: any[] = await this.saveUserOffers(userData.offers);
     const updatedUser = await UserApi.updateById(insertedUser.id, { offers: savedOffersIds });
-    console.log(typeof updatedUser.id, updatedUser.id);
     const token = createToken(updatedUser.id);
     return { user: updatedUser, token };
   }

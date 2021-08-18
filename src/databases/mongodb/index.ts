@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
 import Logger from '../../handlers/Logger';
-import { dbConfig } from '../../config';
+import { getDbConfig } from '../../config';
 
-// Build the connection string
-const dbURI = `mongodb+srv://${dbConfig.user}:${encodeURIComponent(dbConfig.password)}@${dbConfig.host}/${dbConfig.name}`;
+let dbURI: string;
 
 const options = {
   useNewUrlParser: true,
@@ -27,18 +26,23 @@ export const normalized = (data: any) => {
   return data;
 };
 
-Logger.debug(dbURI);
 
 // Create the database connection
-export const connectDB = () => mongoose
-  .connect(dbURI, options)
-  .then(() => {
-    Logger.info('Mongoose connection done');
-  })
-  .catch((e) => {
-    Logger.info('Mongoose connection error');
-    Logger.error(e);
-  });
+export const connectDB = () => {
+  // Build the connection string
+  const dbConfig = getDbConfig();
+  dbURI = `mongodb+srv://${dbConfig.user}:${encodeURIComponent(dbConfig.password)}@${dbConfig.host}/${dbConfig.name}`;
+  Logger.debug(dbURI);
+  return mongoose
+    .connect(dbURI, options)
+    .then(() => {
+      Logger.info('Mongoose connection done');
+    })
+    .catch((e) => {
+      Logger.info('Mongoose connection error');
+      Logger.error(e);
+    });
+};
 
 // CONNECTION EVENTS
 // When successfully connected

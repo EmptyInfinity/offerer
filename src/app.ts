@@ -2,7 +2,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import { corsUrl } from './config';
 import { NotFoundError } from './handlers/ApiError';
 import getRoutes from './routes';
 import errorMiddleware from './helpers/errorMiddleware';

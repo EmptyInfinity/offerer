@@ -50,6 +50,7 @@ router.put(
 
 router.delete(
   '/',
+  verifyToken,
   asyncHandler(async (req: Request, res: Response) => {
     await UserService.deleteById(req.user.id);
     return SuccessResponse(res, 200);
@@ -57,7 +58,7 @@ router.delete(
 );
 /* CRUD */
 
-router.delete(
+router.delete( // DEV-only
   '/',
   asyncHandler(async (req: Request, res: Response) => {
     await UserService.deleteAll();

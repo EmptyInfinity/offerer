@@ -4,3 +4,4 @@ dist
 logs
 uploads
 .nyc_output
+coverage

@@ -17,6 +17,7 @@ describe('userRoute', () => {
         expect(headers['auth-token']).to.be.a('string');
         expect(headers['auth-token'].length > 100).to.be.equal(true);
         user.id = body.id;
+        user.offers = [];
         delete user.password;
         expect(body).to.be.deep.equal(user);
 
@@ -166,7 +167,7 @@ describe('userRoute', () => {
       });
     });
   });
-  describe('/GET', () => {
+  xdescribe('/GET', () => {
     describe('/users', () => {
       it('should successfully get users', async () => {
         const { user } = await UserService.createOne(formUser({}));
@@ -176,6 +177,43 @@ describe('userRoute', () => {
         // request validation
         expect(status).to.be.equal(200);
         expect(body).to.be.deep.equal([user, user2]);
+      });
+    });
+    describe('/users/:id', () => {
+      it('should successfully get user', async () => {
+        const { user } = await UserService.createOne(formUser({}));
+
+        const { body, status } = await global.server.get(`/users/${user.id}`).send();
+        // request validation
+        expect(status).to.be.equal(200);
+        expect(body).to.be.deep.equal(user);
+      });
+      it('should return error (user not found)', async () => {
+        const { body, status } = await global.server.get('/users/612bff4b0e6f92c162e3262b').send();
+        // request validation
+        expect(status).to.be.equal(404);
+        expect(body.message).to.be.deep.equal('User not found!');
+      });
+    });
+  });
+  describe('/DELETE', () => {
+    describe('/users', () => {
+      it('should successfully delete user', async () => {
+        const { user } = await UserService.createOne(formUser({}));
+
+        const token = createToken(user.id);
+        const { body, status } = await global.server.delete('/users').send().set({ 'auth-token': token });
+        // request validation
+        expect(status).to.be.equal(200);
+        expect(body).to.be.deep.equal({});
+        // DB validation
+        let findUserInDbError;
+        try {
+          await UserService.getById(user.id);
+        } catch (err) {
+          findUserInDbError = err.message;
+        }
+        expect(findUserInDbError).to.be.equal('User not found!');
       });
     });
   });

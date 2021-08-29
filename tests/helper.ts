@@ -1,11 +1,9 @@
-export const formUser = (name?: String, email?: String, role?: String, password?: String): any => ({
-  name: name || 'username',
-  email: email || 'username@gmail.com',
-  role: role || 'user',
-  password: password || 'Password1',
+export const formUser = ({
+  name = 'username', email = 'username@gmail.com', role = 'user', password = 'Password1',
+}): any => ({
+  name, email, role, password,
 });
 
-export const formCompany = (name?: String, link?: String): any => ({
-  name: name || 'companyName',
-  link: link || 'https://company.com',
+export const formCompany = ({ name = 'companyName', link = 'https://company.com' }): any => ({
+  name, link,
 });

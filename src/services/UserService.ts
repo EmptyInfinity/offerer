@@ -27,7 +27,7 @@ export default class UserService {
     const password = await this.hashPassword(userData.password);
     const insertedUser = await UserApi.createOne({ ...userData, password });
     const token = createToken(insertedUser.id);
-    const user = { id: insertedUser.id, ...userData };
+    const user: IUser = { id: insertedUser.id, offers: [], ...userData };
     delete user.password;
     return { user, token };
   }

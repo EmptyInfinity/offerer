@@ -5,7 +5,7 @@ import { normalized } from '../index';
 
 export default class CompanyDbApi {
   /* CRUD */
-  public static createOne(companyData: ICompany): Promise<ICompany> {
+  public static async createOne(companyData: ICompany): Promise<ICompany> {
     return CompanyModel.create(companyData);
   }
 

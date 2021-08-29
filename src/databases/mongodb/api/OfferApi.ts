@@ -5,7 +5,7 @@ import { normalized } from '../index';
 
 export default class OfferDbApi {
   /* CRUD */
-  public static createOne(offerData: IOffer): Promise<IOffer> {
+  public static async createOne(offerData: IOffer): Promise<IOffer> {
     return OfferModel.create(offerData);
   }
 
@@ -19,11 +19,11 @@ export default class OfferDbApi {
     return companies.map((offer: IOffer) => normalized(offer));
   }
 
-  public static updateById(id: Types.ObjectId, offerData: IOffer): Promise<IOffer | null> {
+  public static async updateById(id: Types.ObjectId, offerData: IOffer): Promise<IOffer | null> {
     return OfferModel.findByIdAndUpdate(id, { $set: offerData }).exec();
   }
 
-  public static deleteById(id: Types.ObjectId): Promise<IOffer> {
+  public static async deleteById(id: Types.ObjectId): Promise<IOffer> {
     return OfferModel.findByIdAndDelete(id).exec();
   }
   /* CRUD END */

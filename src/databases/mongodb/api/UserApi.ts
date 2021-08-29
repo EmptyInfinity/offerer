@@ -5,7 +5,7 @@ import { normalized } from '../index';
 
 export default class UserDbApi {
   /* CRUD */
-  public static createOne(userData: IUser): Promise<IUser> {
+  public static async createOne(userData: IUser): Promise<IUser> {
     return UserModel.create(userData);
   }
 
@@ -21,20 +21,20 @@ export default class UserDbApi {
     return users.map((user: IUser) => normalized(user));
   }
 
-  public static updateById(id: Types.ObjectId, userData: IUser): Promise<IUser | null> {
+  public static async updateById(id: Types.ObjectId, userData: IUser): Promise<IUser | null> {
     return UserModel.findByIdAndUpdate(id, { $set: userData }, { new: true }).exec();
   }
 
-  public static deleteById(id: Types.ObjectId): Promise<IUser> {
+  public static async deleteById(id: Types.ObjectId): Promise<IUser> {
     return UserModel.findByIdAndDelete(id).exec();
   }
 
   /* CRUD END */
-  public static deleteAll(): Promise<any> {
+  public static async deleteAll(): Promise<any> {
     return UserModel.deleteMany({}).exec();
   }
 
-  public static joinCompany(userId: Types.ObjectId, companyId: Types.ObjectId): Promise<IUser | null> {
+  public static async joinCompany(userId: Types.ObjectId, companyId: Types.ObjectId): Promise<IUser | null> {
     return UserModel.findByIdAndUpdate(userId, { $set: { company: companyId } }).exec();
   }
 

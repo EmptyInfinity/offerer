@@ -5,7 +5,7 @@ import { normalized } from '../index';
 
 export default class CompanyInvoiceDbApi {
   /* CRUD */
-  public static createOne(companyInviteData: ICompanyInvite): Promise<ICompanyInvite> {
+  public static async createOne(companyInviteData: ICompanyInvite): Promise<ICompanyInvite> {
     return CompanyInviteModel.create(companyInviteData);
   }
 
@@ -22,7 +22,7 @@ export default class CompanyInvoiceDbApi {
     return normalized(companyInvoice);
   }
 
-  public static deleteById(id: Types.ObjectId): Promise<ICompanyInvite> {
+  public static async deleteById(id: Types.ObjectId): Promise<ICompanyInvite> {
     return CompanyInviteModel.findByIdAndDelete(id).exec();
   }
 

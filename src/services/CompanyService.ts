@@ -15,24 +15,32 @@ export default class CompanyService {
     return company;
   }
 
-  public static getAll(): Promise<ICompany[]> {
+  public static async getAll(): Promise<ICompany[]> {
     return CompanyApi.getAll();
   }
 
-  public static createOne(companyData: ICompany): Promise<ICompany> {
+  public static async createOne(companyData: ICompany): Promise<ICompany> {
     return CompanyApi.createOne(companyData);
   }
 
-  public static updateById(id: any, companyData: ICompany): Promise<ICompany> {
+  public static async updateById(id: any, companyData: ICompany): Promise<ICompany | null> {
     return CompanyApi.updateById(id, companyData);
   }
 
-  public static deleteById(id: any): Promise<ICompany> {
+  public static async deleteById(id: any): Promise<ICompany> {
     return CompanyApi.deleteById(id);
   }
   /* CRUD END */
 
-  public static inviteUserToCompany(userId: any, companyId:any): Promise<ICompanyInvite> {
-    return CompanyInviteApi.createOne({ userId, companyId });
+  public static async inviteUser(companyId: any, userId: any): Promise<ICompanyInvite> {
+    return CompanyInviteApi.createOne({ company: companyId, user: userId });
+  }
+
+  public static async addUser(companyId: any, userId: any): Promise<ICompany | null> {
+    return CompanyApi.addUser(companyId, userId);
+  }
+
+  public static async removeUser(companyId: any, userId: any): Promise<ICompany | null> {
+    return CompanyApi.removeUser(companyId, userId);
   }
 }

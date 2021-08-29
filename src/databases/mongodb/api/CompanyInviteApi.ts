@@ -11,7 +11,10 @@ export default class CompanyInvoiceDbApi {
 
   public static async getById(id: Types.ObjectId): Promise<ICompanyInvite | undefined> {
     const companyInvoice: ICompanyInvite | undefined = await CompanyInviteModel.findById(id).lean<ICompanyInvite>();
-    return normalized(companyInvoice);
+    console.time('normalized');
+    const a = normalized(companyInvoice);
+    console.timeEnd('normalized');
+    return a;
   }
 
   public static async getOne(searchData: object): Promise<ICompanyInvite | undefined> {

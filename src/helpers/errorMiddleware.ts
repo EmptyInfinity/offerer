@@ -14,13 +14,12 @@ export default (err: Error, req: Request, res: Response, next: NextFunction) => 
       const message = `File should not exceed ${MAX_IMAGE_SIZE_IN_BYTES / 100}kb`;
       ApiError.handle(new BadRequestError(message), res);
     } else {
+      if (environment === 'development') {
+        Logger.error(err.message);
+      }
       ApiError.handle(new InternalError(), res);
     }
   } else {
-    if (environment === 'development') {
-      Logger.error(err);
-      return res.status(500).send(err.message);
-    }
-    ApiError.handle(new InternalError(), res);
+    ApiError.handle(new InternalError(err?.message), res);
   }
 };

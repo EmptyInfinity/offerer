@@ -6,7 +6,11 @@ export const worldToPlural = (word: string):string => { // https://www.npmjs.com
   if (lastLetter === 'y') return `${word.slice(0, -1)}ies`;
   return `${word}s`;
 };
-export const createToken = (userId: string) => sign(
-  { userId },
-  process.env.TOKEN_SECRET,
-);
+export const createToken = (userId: string) => {
+  const userIdString = userId.toString();
+  return sign(
+    { userId: userIdString },
+    process.env.TOKEN_SECRET,
+    { expiresIn: '7d' },
+  );
+};

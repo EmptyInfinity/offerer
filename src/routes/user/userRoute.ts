@@ -66,7 +66,7 @@ router.delete(
 );
 
 router.post(
-  '/joinCompany/:companyId',
+  '/join-company/:companyId',
   verifyToken,
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
@@ -77,12 +77,12 @@ router.post(
 );
 
 router.post(
-  '/leaveCompany',
+  '/leave-company',
   verifyToken,
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
     Accessor.canUserLeaveCompany(req);
-    await UserService.leaveCompany(req.user.id);
+    await UserService.leaveCompany(req.user);
     return SuccessResponse(res, 200);
   }),
 );

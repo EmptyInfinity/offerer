@@ -11,7 +11,7 @@ export default class UserDbApi {
 
   public static async getById(id: Types.ObjectId): Promise<IUser | undefined> {
     const user: IUser | undefined = await UserModel.findById(id).lean<IUser>()
-      .populate('company', '-_id').populate('offers', '-_id');
+      .populate('company').populate('offers', '-_id');
     return normalized(user);
   }
 
@@ -34,7 +34,7 @@ export default class UserDbApi {
     return UserModel.deleteMany({}).exec();
   }
 
-  public static joinCompany(userId: Types.ObjectId, companyId: Types.ObjectId): Promise<any> {
+  public static joinCompany(userId: Types.ObjectId, companyId: Types.ObjectId): Promise<IUser | null> {
     return UserModel.findByIdAndUpdate(userId, { $set: { company: companyId } }).exec();
   }
 

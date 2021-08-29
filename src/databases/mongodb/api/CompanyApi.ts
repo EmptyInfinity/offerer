@@ -19,12 +19,20 @@ export default class CompanyDbApi {
     return companies.map((company: ICompany) => normalized(company));
   }
 
-  public static updateById(id: Types.ObjectId, companyData: ICompany): Promise<ICompany> {
+  public static async updateById(id: Types.ObjectId, companyData: ICompany): Promise<ICompany | null> {
     return CompanyModel.findByIdAndUpdate(id, { $set: companyData }).exec();
   }
 
-  public static deleteById(id: Types.ObjectId): Promise<ICompany> {
+  public static async deleteById(id: Types.ObjectId): Promise<ICompany> {
     return CompanyModel.findByIdAndDelete(id).exec();
   }
   /* CRUD END */
+
+  public static async addUser(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<ICompany | null> {
+    return CompanyModel.findByIdAndUpdate(companyId, { $addToSet: { workers: userId } }).exec();
+  }
+
+  public static async removeUser(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<ICompany | null> {
+    return CompanyModel.findByIdAndUpdate(companyId, { $pull: { workers: userId } }).exec();
+  }
 }

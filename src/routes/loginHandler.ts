@@ -33,7 +33,7 @@ router.post(
     if (!isPasswordCorrect) {
       return next(new BadRequestError('Password or email is wrong'));
     }
-    const token = createToken(`${user.id}`);
+    const token = createToken(user.id);
     res.set({ 'auth-token': token });
     SuccessResponse(res, 200);
   }),

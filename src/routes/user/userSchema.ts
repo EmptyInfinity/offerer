@@ -22,16 +22,15 @@ export default {
       .messages({
         'string.pattern.base': '"password" should contain at least one capital letter and one number',
       }),
-    company: JoiValidId(),
-    offers: Joi.array().items(
-      Joi.object().keys({
-        name: Joi.string().required().min(5).max(100)
-          .trim()
-          .valid(...offerNameEnum),
-        description: Joi.string().min(10).max(200).trim(),
-        price: Joi.number().required().min(offerMinPrice).max(offerMaxPrice),
-      }),
-    ).required(),
+    // offers: Joi.array().items(
+    //   Joi.object().keys({
+    //     name: Joi.string().required().min(5).max(100)
+    //       .trim()
+    //       .valid(...offerNameEnum),
+    //     description: Joi.string().min(10).max(200).trim(),
+    //     price: Joi.number().required().min(offerMinPrice).max(offerMaxPrice),
+    //   }),
+    // ).required(),
   }),
   put: Joi.object().keys({
     name: Joi.string().min(2).max(100)

@@ -68,7 +68,7 @@ router.post(
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
     Accessor.canUserInviteToCompany(req);
-    await CompanyService.inviteUserToCompany(req.params.userId, req.user.company);
+    await CompanyService.inviteUser(req.params.userId, req.user.company);
     return SuccessResponse(res, 200);
   }),
 );

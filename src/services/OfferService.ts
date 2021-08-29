@@ -22,7 +22,7 @@ export default class OfferService {
     return OfferApi.createOne(offerData);
   }
 
-  public static updateById(id: any, offerData: IOffer): Promise<IOffer> {
+  public static updateById(id: any, offerData: IOffer): Promise<IOffer | null> {
     return OfferApi.updateById(id, offerData);
   }
 

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import isPlainObject from 'lodash.isplainobject';
 import Logger from '../../handlers/Logger';
 import { getDbConfig } from '../../config';
 
@@ -19,11 +20,15 @@ const options = {
 
 export const isValidId = (id: string) => mongoose.isValidObjectId(id);
 export const isDbError = (error: any) => error.name === 'MongoError';
-export const normalized = (data: any) => {
-  if (!data) return undefined;
-  data.id = `${data._id}`;
-  delete data._id;
-  return data;
+export const normalized = (object: any) => {
+  if (!object) return undefined;
+  object.id = `${object._id}`;
+  delete object._id;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [key, value] of Object.entries(object)) {
+    if (isPlainObject(value)) object[key] = normalized(value);
+  }
+  return object;
 };
 
 

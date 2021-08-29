@@ -19,7 +19,7 @@ export default class OfferDbApi {
     return companies.map((offer: IOffer) => normalized(offer));
   }
 
-  public static updateById(id: Types.ObjectId, offerData: IOffer): Promise<IOffer> {
+  public static updateById(id: Types.ObjectId, offerData: IOffer): Promise<IOffer | null> {
     return OfferModel.findByIdAndUpdate(id, { $set: offerData }).exec();
   }
 

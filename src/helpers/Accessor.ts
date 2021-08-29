@@ -6,7 +6,7 @@ import { ForbiddenError } from '../handlers/ApiError';
 export default class Accessor {
   public static canUserCreateCompany = (req: Request) => {
     if (req.user.role === USER_ROLE.companyAdmin) {
-      throw new ForbiddenError('User can be admin of only one company!');
+      throw new ForbiddenError('User can be \'admin\' of only one company!');
     }
   }
 
@@ -20,14 +20,14 @@ export default class Accessor {
   }
 
   public static canUserJoinCompany = (req: Request) => {
-    if (req.user.company) {
-      throw new ForbiddenError();
+    if (req.user.company) { // probably it should not be here
+      throw new ForbiddenError('User already belongs company!');
     }
   }
 
   public static canUserLeaveCompany = (req: Request) => {
-    if (!req.user.company) {
-      throw new ForbiddenError();
+    if (!req.user.company) { // probably it should not be here
+      throw new ForbiddenError('User does not belongs any company!');
     }
   }
 
@@ -37,5 +37,6 @@ export default class Accessor {
 
   private static isUserCompanyAdmin = (user: IUser) => user.role === USER_ROLE.companyAdmin;
 
-  private static isUserBelongsCompany = (userId: string, companyId: string) => userId == companyId;
+  // I don't think that validation here should be more complex. But it can take a place (depends on app)
+  private static isUserBelongsCompany = (userCompanyId: string, companyId: string) => userCompanyId == companyId;
 }

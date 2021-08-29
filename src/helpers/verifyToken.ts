@@ -13,6 +13,9 @@ declare global {
     }
   }
 }
+interface UserPayload {
+  userId: string;
+}
 
 // eslint-disable-next-line consistent-return
 export default async (req: Request, res: Response, next: NextFunction) => {
@@ -20,7 +23,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   if (!token) return next(new ForbiddenError());
 
   try {
-    const userId = verify(token, process.env.TOKEN_SECRET);
+    const { userId } = verify(token, process.env.TOKEN_SECRET) as UserPayload;
     const user = await UserService.getById(userId);
     if (!user) return next(new ForbiddenError());
     req.user = user;

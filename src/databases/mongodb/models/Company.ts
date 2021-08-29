@@ -1,27 +1,30 @@
-import { model, Schema, Document } from 'mongoose';
+import {
+  model, Schema, Document, Types,
+} from 'mongoose';
 import { ICompany } from '../../interfaces';
 
-const { Types } = Schema;
 export const DOCUMENT_NAME = 'Company';
 export const COLLECTION_NAME = 'companies';
-export interface CompanyDocument extends ICompany, Document {}
+export interface CompanyDocument extends ICompany, Document {
+  workers: Types.ObjectId[]
+}
 
 const schema = new Schema(
   {
     name: {
-      type: Types.String,
+      type: Schema.Types.String,
       required: true,
       trim: true,
       unique: true,
       maxlength: 100,
     },
     link: {
-      type: Types.String,
+      type: Schema.Types.String,
       unique: true,
       maxlength: 100,
     },
     workers: [{
-      type: Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User',
     }],
   },

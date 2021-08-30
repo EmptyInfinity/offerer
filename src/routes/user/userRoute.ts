@@ -11,6 +11,15 @@ import Accessor from '../../helpers/Accessor';
 const router = express.Router();
 
 /* CRUD */
+/**
+ * @swagger
+ * /users:
+ *   post:
+ *     description: Created user
+ *     responses:
+ *       200:
+ *         description: created user
+ */
 router.post(
   '/',
   validator(schema.post, ValidationSource.BODY),
@@ -21,6 +30,15 @@ router.post(
   }),
 );
 
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     description: Returns list of all users
+ *     responses:
+ *       200:
+ *         description: A list of users
+ */
 router.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
@@ -29,6 +47,17 @@ router.get(
   }),
 );
 
+/**
+ * @swagger
+ * /users/:id:
+ *   get:
+ *     description: Returns list of all users
+ *     responses:
+ *       200:
+ *         description: A list of users
+ *       404:
+ *         description: User not found
+ */
 router.get(
   '/:id',
   validator(null, ValidationSource.PARAM),

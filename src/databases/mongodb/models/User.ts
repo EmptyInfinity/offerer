@@ -13,33 +13,35 @@ const schema = new Schema(
       type: Types.String,
       required: true,
       trim: true,
-      maxlength: 100,
+      maxlength: 60,
     },
     email: {
       type: Types.String,
       required: true,
       unique: true,
       trim: true,
-      maxlength: 100,
+      maxlength: 60,
     },
     password: {
       type: Types.String,
       select: false,
       required: true,
     },
+    skills: [{
+      type: Types.String,
+      trim: true,
+      maxlength: 30,
+    }],
+    bio: {
+      type: Types.String,
+      trim: true,
+      maxlength: 500,
+    },
     role: {
       type: Types.String,
-      required: true,
       enum: Object.values(USER_ROLE),
+      required: true,
     },
-    company: {
-      type: Types.ObjectId,
-      ref: 'Company',
-    },
-    offers: [{
-      type: Types.ObjectId,
-      ref: 'Offer',
-    }],
   },
   {
     versionKey: false,

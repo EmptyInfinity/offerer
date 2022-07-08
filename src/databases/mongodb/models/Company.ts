@@ -1,6 +1,7 @@
 import {
   model, Schema, Document, Types,
 } from 'mongoose';
+import { USER_COMPANY_ROLE } from '../../../config';
 import { ICompany } from '../../interfaces';
 
 export const DOCUMENT_NAME = 'Company';
@@ -23,9 +24,22 @@ const schema = new Schema(
       unique: true,
       maxlength: 100,
     },
+    description: {
+      type: Schema.Types.String,
+      trim: true,
+      maxlength: 500,
+    },
     workers: [{
-      type: Schema.Types.ObjectId,
-      ref: 'User',
+      role: {
+        type: Schema.Types.String,
+        enum: Object.values(USER_COMPANY_ROLE),
+        required: true,
+      },
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+      },
     }],
   },
   {

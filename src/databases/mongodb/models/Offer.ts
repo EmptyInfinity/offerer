@@ -19,7 +19,7 @@ const schema = new Schema(
       minlength: 5,
       maxlength: 100,
     },
-    price: {
+    salary: {
       type: Types.Number,
       required: true,
       min: offerMinPrice,
@@ -30,6 +30,11 @@ const schema = new Schema(
       trim: true,
       minlength: 10,
       maxlength: 200,
+    },
+    company: {
+      type: Schema.Types.ObjectId,
+      ref: 'Company',
+      required: true,
     },
   },
   {

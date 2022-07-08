@@ -8,9 +8,14 @@ export interface InviteDocument extends IInvite, Document { }
 
 const schema = new Schema(
   {
-    company: {
+    inviter: {
+      type: Types.String,
+      enum: ['user', 'company'],
+      required: true,
+    },
+    offer: {
       type: Types.ObjectId,
-      ref: 'Company',
+      ref: 'Offer',
       required: true,
     },
     user: {

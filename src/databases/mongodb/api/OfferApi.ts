@@ -10,12 +10,12 @@ export default class OfferDbApi {
   }
 
   public static async getById(id: Types.ObjectId): Promise<IOffer | undefined> {
-    const offer: IOffer | undefined = await OfferModel.findById(id).lean<IOffer>();
+    const offer: IOffer | undefined = await OfferModel.findById(id).lean();
     return normalized(offer);
   }
 
   public static async getAll(): Promise<IOffer[]> {
-    const companies: IOffer[] = await OfferModel.find().lean<IOffer>();
+    const companies: IOffer[] = await OfferModel.find().lean();
     return companies.map((offer: IOffer) => normalized(offer));
   }
 

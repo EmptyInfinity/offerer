@@ -1,4 +1,4 @@
-import { USER_ROLE, OFFER_NAME } from '../config';
+import { USER_ROLE } from '../config';
 
 export interface IUser {
   id?: any
@@ -19,12 +19,12 @@ export interface ICompany {
 
 export interface IOffer {
   id?: any
-  name: OFFER_NAME
+  name: string
   price: number
   description?: string
 }
 
-export interface ICompanyInvite {
+export interface IInvite {
   id?: any
   user: any | IUser
   company: any | ICompany

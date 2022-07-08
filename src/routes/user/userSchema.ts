@@ -3,7 +3,6 @@ import { JoiValidId } from '../../helpers/validator';
 import { USER_ROLE } from '../../config';
 
 const validUserRoles = Object.keys(USER_ROLE);
-const offerNameEnum = JSON.parse(process.env.OFFERS_ARRAY);
 const { OFFER_MIN_PRICE = '0', OFFER_MAX_PRICE = '10000' } = process.env;
 const offerMinPrice = parseInt(OFFER_MIN_PRICE);
 const offerMaxPrice = parseInt(OFFER_MAX_PRICE);

@@ -1,17 +1,23 @@
 import { expect } from 'chai';
+import request from 'supertest';
 import UserService from '../../src/services/UserService';
 import CompanyService from '../../src/services/CompanyService';
-import CompanyInviteService from '../../src/services/CompanyInviteService';
+import InviteService from '../../src/services/InviteService';
 import { formUser, formCompany } from '../helper';
 import { createToken } from '../../src/helpers';
+import getApp from '../../src/app';
 
 describe('userRoute', () => {
-  xdescribe('/POST', () => {
+  let server: any;
+  beforeAll(async () => {
+    server = request(await getApp());
+  });
+  describe('/POST', () => {
     describe('/users', () => {
       it('should add user', async () => {
         const user = formUser({});
 
-        const { body, status, headers } = await global.server.post('/users').send(user);
+        const { body, status, headers } = await server.post('/users').send(user);
         // request validation
         expect(status).to.be.equal(200);
         expect(headers['auth-token']).to.be.a('string');
@@ -29,7 +35,7 @@ describe('userRoute', () => {
         const user = formUser({});
         delete user.name;
 
-        const { body, status } = await global.server.post('/users').send(user);
+        const { body, status } = await server.post('/users').send(user);
         // request validation
         expect(status).to.be.equal(400);
         expect(body.message).to.be.equal('"name" is required');
@@ -42,7 +48,7 @@ describe('userRoute', () => {
         const user = formUser({});
         await UserService.createOne(user);
 
-        const { body, status } = await global.server.post('/users').send(user);
+        const { body, status } = await server.post('/users').send(user);
         // request validation
         expect(status).to.be.equal(500);
         expect(body.message).to.be.equal(`Email "${user.email}" is already in use!`);
@@ -57,7 +63,7 @@ describe('userRoute', () => {
         const user = formUser({});
         await UserService.createOne(user);
 
-        const { body, status, headers } = await global.server.post('/login').send({ email: user.email, password: user.password });
+        const { body, status, headers } = await server.post('/login').send({ email: user.email, password: user.password });
         // request validation
         expect(status).to.be.equal(200);
         expect(headers['auth-token']).to.be.a('string');
@@ -68,14 +74,14 @@ describe('userRoute', () => {
         const user = formUser({});
         await UserService.createOne(user);
 
-        const { body, status, headers } = await global.server.post('/login').send({ email: user.email, password: 'wrong_password' });
+        const { body, status, headers } = await server.post('/login').send({ email: user.email, password: 'wrong_password' });
         // request validation
         expect(status).to.be.equal(400);
         expect(body.message).to.be.equal('Password or email is wrong');
         expect(headers['auth-token']).to.be.an('undefined');
       });
       it('should fail login (user not found)', async () => {
-        const { body, status, headers } = await global.server.post('/login').send({ email: 'some_email', password: 'some_password' });
+        const { body, status, headers } = await server.post('/login').send({ email: 'some_email', password: 'some_password' });
         // request validation
         expect(status).to.be.equal(400);
         expect(body.message).to.be.equal('Password or email is wrong');
@@ -89,7 +95,7 @@ describe('userRoute', () => {
         await CompanyService.inviteUser(company.id, user.id);
 
         const token = createToken(user.id);
-        const { body, status, headers } = await global.server.post(`/users/join-company/${company.id}`).send().set({ 'auth-token': token });
+        const { body, status, headers } = await server.post(`/users/join-company/${company.id}`).send().set({ 'auth-token': token });
         // request validation
         expect(status).to.be.equal(200);
         expect(headers['auth-token']).to.be.an('undefined');
@@ -99,7 +105,7 @@ describe('userRoute', () => {
         expect(userInDb.company.id).to.be.equal(company.id);
         const companyInDb = await CompanyService.getById(company.id);
         expect(companyInDb.workers.length).to.be.equal(1);
-        const companyInvitesInDb = await CompanyInviteService.getAll();
+        const companyInvitesInDb = await InviteService.getAll();
         expect(companyInvitesInDb.length).to.be.equal(0);
       });
       it('should return error (user was not invited)', async () => {
@@ -107,7 +113,7 @@ describe('userRoute', () => {
         const { user } = await UserService.createOne(formUser({}));
 
         const token = createToken(user.id);
-        const { body, status } = await global.server.post(`/users/join-company/${company.id}`).send().set({ 'auth-token': token });
+        const { body, status } = await server.post(`/users/join-company/${company.id}`).send().set({ 'auth-token': token });
         // request validation
         expect(status).to.be.equal(403);
         expect(body.message).to.be.equal('Permission denied');
@@ -124,7 +130,7 @@ describe('userRoute', () => {
         await UserService.joinCompany(user.id, company.id);
 
         const token = createToken(user.id);
-        const { body, status } = await global.server.post(`/users/join-company/${company.id}`).send().set({ 'auth-token': token });
+        const { body, status } = await server.post(`/users/join-company/${company.id}`).send().set({ 'auth-token': token });
         // request validation
         expect(status).to.be.equal(403);
         expect(body.message).to.be.equal('User already belongs company!');
@@ -143,7 +149,7 @@ describe('userRoute', () => {
         await UserService.joinCompany(user.id, company.id);
 
         const token = createToken(user.id);
-        const { body, status } = await global.server.post('/users/leave-company').send().set({ 'auth-token': token });
+        const { body, status } = await server.post('/users/leave-company').send().set({ 'auth-token': token });
         // request validation
         expect(status).to.be.equal(200);
         expect(body).to.be.deep.equal({});
@@ -157,7 +163,7 @@ describe('userRoute', () => {
         const { user } = await UserService.createOne(formUser({}));
 
         const token = createToken(user.id);
-        const { body, status } = await global.server.post('/users/leave-company').send().set({ 'auth-token': token });
+        const { body, status } = await server.post('/users/leave-company').send().set({ 'auth-token': token });
         // request validation
         expect(status).to.be.equal(403);
         expect(body.message).to.be.equal('User does not belongs any company!');
@@ -167,13 +173,13 @@ describe('userRoute', () => {
       });
     });
   });
-  xdescribe('/GET', () => {
+  describe('/GET', () => {
     describe('/users', () => {
       it('should successfully get users', async () => {
         const { user } = await UserService.createOne(formUser({}));
         const { user: user2 } = await UserService.createOne(formUser({ email: 'some@email.com' }));
 
-        const { body, status } = await global.server.get('/users').send();
+        const { body, status } = await server.get('/users').send();
         // request validation
         expect(status).to.be.equal(200);
         expect(body).to.be.deep.equal([user, user2]);
@@ -183,13 +189,13 @@ describe('userRoute', () => {
       it('should successfully get user', async () => {
         const { user } = await UserService.createOne(formUser({}));
 
-        const { body, status } = await global.server.get(`/users/${user.id}`).send();
+        const { body, status } = await server.get(`/users/${user.id}`).send();
         // request validation
         expect(status).to.be.equal(200);
         expect(body).to.be.deep.equal(user);
       });
       it('should return error (user not found)', async () => {
-        const { body, status } = await global.server.get('/users/612bff4b0e6f92c162e3262b').send();
+        const { body, status } = await server.get('/users/612bff4b0e6f92c162e3262b').send();
         // request validation
         expect(status).to.be.equal(404);
         expect(body.message).to.be.deep.equal('User not found!');
@@ -202,7 +208,7 @@ describe('userRoute', () => {
         const { user } = await UserService.createOne(formUser({}));
 
         const token = createToken(user.id);
-        const { body, status } = await global.server.delete('/users').send().set({ 'auth-token': token });
+        const { body, status } = await server.delete('/users').send().set({ 'auth-token': token });
         // request validation
         expect(status).to.be.equal(200);
         expect(body).to.be.deep.equal({});

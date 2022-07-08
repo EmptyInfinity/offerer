@@ -9,7 +9,7 @@ import CompanyService from './CompanyService';
 const dbPath = `../databases/${dbDir}`;
 const { default: UserApi } = require(`${dbPath}/api/UserApi`);
 const { default: OfferApi } = require(`${dbPath}/api/OfferApi`);
-const { default: CompanyInviteApi } = require(`${dbPath}/api/CompanyInviteApi`);
+const { default: InviteApi } = require(`${dbPath}/api/InviteApi`);
 
 export default class UserService {
   /* CRUD */
@@ -23,7 +23,7 @@ export default class UserService {
     return UserApi.getAll();
   }
 
-  public static async createOne(userData: IUser): Promise<{user:IUser, token: string}> {
+  public static async createOne(userData: IUser): Promise<{ user: IUser, token: string }> {
     const password = await this.hashPassword(userData.password);
     const insertedUser = await UserApi.createOne({ ...userData, password });
     const token = createToken(insertedUser.id);
@@ -50,10 +50,10 @@ export default class UserService {
   }
 
   public static async joinCompany(userId: any, companyId: any): Promise<IUser | null> {
-    const invite = await CompanyInviteApi.getOne({ user: userId, company: companyId });
+    const invite = await InviteApi.getOne({ user: userId, company: companyId });
     if (!invite) throw new ForbiddenError();
     await CompanyService.addUser(companyId, userId);
-    await CompanyInviteApi.deleteById(invite.id);
+    await InviteApi.deleteById(invite.id);
     return UserApi.joinCompany(userId, companyId);
   }
 

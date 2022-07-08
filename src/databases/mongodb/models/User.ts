@@ -5,7 +5,7 @@ import { IUser } from '../../interfaces';
 const { Types } = Schema;
 export const DOCUMENT_NAME = 'User';
 export const COLLECTION_NAME = 'users';
-export interface UserDocument extends IUser, Document {}
+export interface UserDocument extends IUser, Document { }
 
 const schema = new Schema(
   {
@@ -50,7 +50,7 @@ schema.set('toJSON', {
   transform(doc, ret) { delete ret._id; },
 });
 schema.post('save', (error: any, { email }: UserDocument, next: any) => {
-  if (error.name === 'MongoError' && error.code === 11000) {
+  if (error.name === 'MongoServerError' && error.code === 11000) {
     next(new Error(`Email "${email}" is already in use!`));
   } else {
     next();

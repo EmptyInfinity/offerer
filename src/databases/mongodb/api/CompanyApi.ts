@@ -15,7 +15,7 @@ export default class CompanyDbApi {
   }
 
   public static async getAll(): Promise<ICompany[]> {
-    const companies: ICompany[] = await CompanyModel.find().lean<ICompany>();
+    const companies: ICompany[] = await CompanyModel.find().lean();
     return companies.map((company: ICompany) => normalized(company));
   }
 

@@ -1,10 +1,10 @@
 import { model, Schema, Document } from 'mongoose';
-import { ICompanyInvite } from '../../interfaces';
+import { IInvite } from '../../interfaces';
 
 const { Types } = Schema;
-export const DOCUMENT_NAME = 'CompaniesInvites';
-export const COLLECTION_NAME = 'companies_invites';
-export interface CompanyInviteDocument extends ICompanyInvite, Document {}
+export const DOCUMENT_NAME = 'Invites';
+export const COLLECTION_NAME = 'invites';
+export interface InviteDocument extends IInvite, Document { }
 
 const schema = new Schema(
   {
@@ -28,4 +28,4 @@ schema.set('toJSON', {
   transform(doc, ret) { delete ret._id; },
 });
 
-export const CompanyInviteModel = model<CompanyInviteDocument>(DOCUMENT_NAME, schema, COLLECTION_NAME);
+export const InviteModel = model<InviteDocument>(DOCUMENT_NAME, schema, COLLECTION_NAME);

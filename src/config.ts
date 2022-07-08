@@ -1,7 +1,23 @@
 // Mapper for environment variables
 import { config } from 'dotenv';
+import { existsSync } from 'fs';
 
-config();
+if (existsSync('.env')) {
+  config();
+  const {
+    NODE_ENV, PORT,
+    DB_DIR, DB_NAME, DB_HOST, DB_PORT, DB_USER, DB_USER_PASSWORD,
+    CORS_URL,
+    ACCESS_TOKEN_VALIDITY_SEC, REFRESH_TOKEN_VALIDITY_SEC, TOKEN_ISSUER, TOKEN_AUDIENCE, TOKEN_SECRET,
+    LOG_DIR,
+  } = process.env;
+  if (!NODE_ENV || !PORT || !DB_DIR || !DB_NAME || !DB_HOST || !DB_USER || !DB_USER_PASSWORD || !TOKEN_SECRET) {
+    throw new Error('Please, provide all environment variables');
+  }
+} else {
+  throw new Error('Please, provide environment variables to .env');
+}
+
 export const environment = process.env.NODE_ENV;
 export const port = process.env.PORT;
 export const dbDir = process.env.DB_DIR;
@@ -10,7 +26,7 @@ export const getDbConfig = () => ({
   host: process.env.DB_HOST || '',
   port: process.env.DB_PORT || '',
   user: process.env.DB_USER || '',
-  password: process.env.DB_USER_PWD || '',
+  password: process.env.DB_USER_PASSWORD || '',
 });
 export const corsUrl = process.env.CORS_URL;
 export const tokenInfo = {
@@ -20,14 +36,8 @@ export const tokenInfo = {
   audience: process.env.TOKEN_AUDIENCE || '',
 };
 export const logDirectory = process.env.LOG_DIR;
-const offersArr: string[] = JSON.parse(process.env.OFFERS_ARRAY);
-const offers = <const> [...offersArr];
 
 export enum USER_ROLE {
   admin = 'admin',
-  user = 'user',
-  customer = 'customer',
-  companyAdmin = 'company_admin'
+  user = 'user'
 }
-
-export type OFFER_NAME = typeof offers[number];

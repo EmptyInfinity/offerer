@@ -28,7 +28,7 @@ export interface IOffer {
 
 export interface IInvite {
   id?: any
-  inviter: ['user', 'company']
+  inviter: 'user' | 'company'
   offer: any | IOffer
   user: any | IUser
 }

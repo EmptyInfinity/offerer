@@ -14,7 +14,7 @@ export interface ICompany {
   id?: any
   name: string
   link?: URL
-  description: string
+  description?: string
   workers: { role: USER_COMPANY_ROLE, user: any | IUser }[]
 }
 

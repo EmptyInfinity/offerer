@@ -6,9 +6,7 @@ import { ICompany } from '../../interfaces';
 
 export const DOCUMENT_NAME = 'Company';
 export const COLLECTION_NAME = 'companies';
-export interface CompanyDocument extends ICompany, Document {
-  workers: Types.ObjectId[]
-}
+export interface CompanyDocument extends ICompany, Document { }
 
 const schema = new Schema(
   {

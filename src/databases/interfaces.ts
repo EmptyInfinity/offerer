@@ -3,7 +3,7 @@ import { USER_ROLE, USER_COMPANY_ROLE } from '../config';
 export interface IUser {
   id?: any
   name: string
-  email: string
+  email?: string
   password?: string
   skills: string[]
   bio?: string

@@ -38,6 +38,7 @@ const schema = new Schema(
         ref: 'User',
         required: true,
       },
+      _id: false,
     }],
   },
   {
@@ -46,7 +47,9 @@ const schema = new Schema(
 );
 schema.set('toJSON', {
   virtuals: true,
-  transform(doc, ret) { delete ret._id; },
+  transform(doc, ret) {
+    delete ret._id;
+  },
 });
 
 export const CompanyModel = model<CompanyDocument>(DOCUMENT_NAME, schema, COLLECTION_NAME);

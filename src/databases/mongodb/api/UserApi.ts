@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import { UserModel } from '../models/User';
 import { IUser } from '../../interfaces';
-import { normalized } from '../index';
+// import { normalized } from '../index';
 
 export default class UserDbApi {
   /* CRUD */
@@ -9,23 +9,25 @@ export default class UserDbApi {
     return UserModel.create(userData);
   }
 
-  public static async getById(id: Types.ObjectId): Promise<IUser | undefined> {
-    const user: IUser | undefined = await UserModel.findById(id).lean<IUser>()
-      .populate('company').populate('offers', '-_id');
-    return normalized(user);
+  public static async getById(id: Types.ObjectId): Promise<IUser | null> {
+    // const user: IUser | undefined = await UserModel.findById(id).lean<IUser>()
+    //   .populate('company').populate('offers', '-_id');
+    // return normalized(user);
+    return UserModel.findById(id).lean();
   }
 
   public static async getAll(): Promise<IUser[]> {
-    const users: IUser[] = await UserModel.find().lean<IUser>()
-      .populate('offers', '-_id -description');
-    return users.map((user: IUser) => normalized(user));
+    // const users: IUser[] = await UserModel.find().lean<IUser>()
+    //   .populate('offers', '-_id -description');
+    // return users.map((user: IUser) => normalized(user));
+    return UserModel.find().lean();
   }
 
   public static async updateById(id: Types.ObjectId, userData: IUser): Promise<IUser | null> {
     return UserModel.findByIdAndUpdate(id, { $set: userData }, { new: true }).exec();
   }
 
-  public static async deleteById(id: Types.ObjectId): Promise<IUser> {
+  public static async deleteById(id: Types.ObjectId): Promise<IUser | null> {
     return UserModel.findByIdAndDelete(id).exec();
   }
 
@@ -34,12 +36,12 @@ export default class UserDbApi {
     return UserModel.deleteMany({}).exec();
   }
 
-  public static async joinCompany(userId: Types.ObjectId, companyId: Types.ObjectId): Promise<IUser | null> {
-    return UserModel.findByIdAndUpdate(userId, { $set: { company: companyId } }).exec();
-  }
+  // public static async joinCompany(userId: Types.ObjectId, companyId: Types.ObjectId): Promise<IUser | null> {
+  //   return UserModel.findByIdAndUpdate(userId, { $set: { company: companyId } }).exec();
+  // }
 
-  public static async getUserByEmailWithPassword(email: string): Promise<IUser | undefined> {
-    const user: IUser | undefined = await UserModel.findOne({ email }).lean<IUser>().select('+password');
-    return normalized(user);
-  }
+  // public static async getUserByEmailWithPassword(email: string): Promise<IUser | undefined> {
+  //   const user: IUser | undefined = await UserModel.findOne({ email }).lean<IUser>().select('+password');
+  //   return normalized(user);
+  // }
 }

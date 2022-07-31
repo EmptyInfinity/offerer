@@ -11,7 +11,7 @@ if (existsSync('.env')) {
     ACCESS_TOKEN_VALIDITY_SEC, REFRESH_TOKEN_VALIDITY_SEC, TOKEN_ISSUER, TOKEN_AUDIENCE, TOKEN_SECRET,
     LOG_DIR,
   } = process.env;
-  if (!NODE_ENV || !PORT || !DB_DIR || !DB_NAME || !DB_HOST || !DB_USER || !DB_USER_PASSWORD || !TOKEN_SECRET) {
+  if (!PORT || !DB_DIR || !DB_NAME || !DB_HOST || !DB_USER || !DB_USER_PASSWORD || !TOKEN_SECRET) {
     throw new Error('Please, provide all environment variables');
   }
 } else {

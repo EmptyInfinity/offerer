@@ -5,12 +5,12 @@ const swaggerOptions = {
   swaggerDefinition: {
     info: {
       version: '1.0.0',
-      title: 'Customer API',
-      description: 'Customer API Information',
+      title: 'Offerer API',
+      description: 'Offerer API Information',
       contact: {
-        name: 'Amazing Developer',
+        name: 'Illia Soroka',
       },
-      servers: ['http://localhost:5000'],
+      servers: ['http://localhost:3333'],
     },
   },
   apis: ['src/routes/**/*.ts'],

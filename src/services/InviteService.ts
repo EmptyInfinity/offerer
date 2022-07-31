@@ -8,8 +8,8 @@ const { default: InviteApi } = require(`${dbPath}/api/InviteApi`);
 
 export default class InviteService {
   /* CRUD */
-  public static async getById(id: any): Promise<IInvite | undefined> {
-    const companyInvite: IInvite | undefined = await InviteApi.getById(id);
+  public static async getById(id: any): Promise<IInvite> {
+    const companyInvite: IInvite | null = await InviteApi.getById(id);
     if (!companyInvite) throw new NotFoundError('Invite not found!');
     return companyInvite;
   }

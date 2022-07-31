@@ -27,7 +27,7 @@ export default class UserService {
     const password = await this.hashPassword(userData.password);
     const insertedUser = await UserApi.createOne({ ...userData, password });
     const token = createToken(insertedUser.id);
-    const user: IUser = { id: insertedUser.id, offers: [], ...userData };
+    const user: IUser = { id: insertedUser.id, ...userData };
     delete user.password;
     return { user, token };
   }
@@ -52,15 +52,15 @@ export default class UserService {
   public static async joinCompany(userId: any, companyId: any): Promise<IUser | null> {
     const invite = await InviteApi.getOne({ user: userId, company: companyId });
     if (!invite) throw new ForbiddenError();
-    await CompanyService.addUser(companyId, userId);
+    // await CompanyService.addUser(companyId, userId);
     await InviteApi.deleteById(invite.id);
     return UserApi.joinCompany(userId, companyId);
   }
 
-  public static async leaveCompany(user: IUser): Promise<IUser | null> {
-    await CompanyService.removeUser(user.company.id, user.id);
-    return UserApi.updateById(user.id, { company: null });
-  }
+  // public static async leaveCompany(user: IUser): Promise<IUser | null> {
+  // await CompanyService.removeUser(user.company.id, user.id);
+  // return UserApi.updateById(user.id, { company: null });
+  // }
 
   private static async hashPassword(password: string): Promise<string> {
     const salt = await genSalt(10);

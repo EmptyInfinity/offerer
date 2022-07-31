@@ -26,9 +26,10 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = verify(token, process.env.TOKEN_SECRET) as UserPayload;
     const user = await UserService.getById(userId);
     if (!user) return next(new ForbiddenError());
-    req.user = user;
+    req.user = { ...user, id: userId }; // mongo-fix
     next();
   } catch (err) {
+    console.log(err);
     Logger.error(err);
     return next(new BadTokenError());
   }

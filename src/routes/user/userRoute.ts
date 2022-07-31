@@ -41,7 +41,9 @@ router.post(
  */
 router.get(
   '/',
+  verifyToken,
   asyncHandler(async (req: Request, res: Response) => {
+    Accessor.canUserGetAllUsers(req);
     const users: IUser[] = await UserService.getAll();
     return SuccessResponse(res, 200, users);
   }),
@@ -60,6 +62,7 @@ router.get(
  */
 router.get(
   '/:id',
+  verifyToken,
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
     const user: IUser = await UserService.getById(req.params.id);
@@ -68,20 +71,22 @@ router.get(
 );
 
 router.put(
-  '/',
+  '/:id',
   verifyToken,
   validator(schema.put, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    await UserService.updateById(req.user.id, req.body);
-    return SuccessResponse(res, 200);
+    Accessor.canUserUpdateUser(req);
+    const updatedUser = await UserService.updateById(req.params.id, req.body);
+    return SuccessResponse(res, 200, updatedUser);
   }),
 );
 
 router.delete(
-  '/',
+  '/:id',
   verifyToken,
   asyncHandler(async (req: Request, res: Response) => {
-    await UserService.deleteById(req.user.id);
+    Accessor.canUserDeleteUser(req);
+    await UserService.deleteById(req.params.id);
     return SuccessResponse(res, 200);
   }),
 );
@@ -111,8 +116,9 @@ router.post(
   verifyToken,
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
-    Accessor.canUserLeaveCompany(req);
-    await UserService.leaveCompany(req.user);
+    console.log('leave');
+    // Accessor.canUserLeaveCompany(req);
+    // await UserService.leaveCompany(req.user);
     return SuccessResponse(res, 200);
   }),
 );

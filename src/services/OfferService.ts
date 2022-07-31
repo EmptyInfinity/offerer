@@ -8,8 +8,8 @@ const { default: OfferApi } = require(`${dbPath}/api/OfferApi`);
 
 export default class OfferService {
   /* CRUD */
-  public static async getById(id: any): Promise<IOffer | undefined> {
-    const offer: IOffer | undefined = await OfferApi.getById(id);
+  public static async getById(id: any): Promise<IOffer> {
+    const offer: IOffer | null = await OfferApi.getById(id);
     if (!offer) throw new NotFoundError('Offer not found!');
     return offer;
   }

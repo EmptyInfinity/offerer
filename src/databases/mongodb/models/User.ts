@@ -18,6 +18,7 @@ const schema = new Schema(
     email: {
       type: Types.String,
       required: true,
+      select: false,
       unique: true,
       trim: true,
       maxlength: 60,

@@ -1,57 +1,46 @@
 import { Request } from 'express';
-import { USER_ROLE } from '../config';
 import { ForbiddenError } from '../handlers/ApiError';
 import CompanyService from '../services/CompanyService';
 
 export default class Accessor {
-  private static isUserCompanyAdmin = async (req: Request) => {
-    const companyId = req.params.id;
-    const userId = req.user.id;
-    return CompanyService.isUserCompanyAdmin(companyId, userId);
+  private static isUserCompanyAdmin = async (companyId: any, userId: any) => CompanyService.isUserCompanyAdmin(companyId, userId);
+
+  private static isUserInCompany = async (companyId: any, userId: any) => CompanyService.isUserInCompany(companyId, userId);
+
+  public static canUserCreateCompany = (isAdmin: boolean) => {
+    if (isAdmin) throw new ForbiddenError('Admin can\'t create companies!');
   }
 
-  private static isUserInCompany = async (req: Request) => {
-    const companyId = req.params.id;
-    const userId = req.user.id;
-    return CompanyService.isUserInCompany(companyId, userId);
-  }
-
-  public static canUserCreateCompany = (req: Request) => {
-    if (req.user.role === USER_ROLE.admin) {
-      throw new ForbiddenError('"admin" can\'t create companies!');
+  public static canUserUpdateCompany = async (companyId: any, userId: any, isAdmin: boolean) => {
+    if (!isAdmin) {
+      if (!await this.isUserCompanyAdmin(companyId, userId)) throw new ForbiddenError();
     }
   }
 
-  public static canUserUpdateCompany = async (req: Request) => {
-    if (req.user.role !== USER_ROLE.admin) {
-      if (!await this.isUserCompanyAdmin(req)) throw new ForbiddenError();
-    }
-  }
-
-  public static canUserJoinCompany = async (req: Request) => {
+  public static canUserJoinCompany = async (companyId: any, userId: any) => {
     // look for existing invite
-    if (!await this.isUserInCompany(req)) throw new ForbiddenError('User already belongs company!');
+    if (!await this.isUserInCompany(companyId, userId)) throw new ForbiddenError('User already belongs company!');
   }
 
-  public static canUserDeleteCompany = async (req: Request) => Accessor.canUserUpdateCompany(req);
+  public static canUserDeleteCompany = async (companyId: any, userId: any, isAdmin: boolean) => Accessor.canUserUpdateCompany(companyId, userId, isAdmin);
 
-  public static canUserInviteToCompany = async (req: Request) => {
-    if (!await this.isUserCompanyAdmin(req)) throw new ForbiddenError();
+  public static canUserInviteToCompany = async (companyId: any, userId: any) => {
+    if (!await this.isUserCompanyAdmin(companyId, userId)) throw new ForbiddenError();
   }
 
   // users route
 
-  public static canUserGetAllUsers = (req: Request) => {
-    if (req.user.role !== USER_ROLE.admin) throw new ForbiddenError();
+  public static canUserGetAllUsers = (isAdmin: boolean) => {
+    if (isAdmin) throw new ForbiddenError();
   }
 
-  public static canUserUpdateUser = (req: Request) => {
-    if (req.user.id !== req.params.id) throw new ForbiddenError();
+  public static canUserUpdateUser = (reqUserId: any, targetUserId: any) => {
+    if (reqUserId !== targetUserId) throw new ForbiddenError();
   }
 
-  public static canUserDeleteUser = (req: Request) => {
-    if (req.user.role !== USER_ROLE.admin) {
-      if (req.user.id !== req.params.id) throw new ForbiddenError();
+  public static canUserDeleteUser = (reqUserId: any, targetUserId: any, isAdmin: boolean) => {
+    if (!isAdmin || reqUserId !== targetUserId) {
+      throw new ForbiddenError();
     }
   }
 }

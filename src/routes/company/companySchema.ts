@@ -7,11 +7,11 @@ export default {
     name: Joi.string().min(2).max(100).trim()
       .required(),
     link: Joi.string().uri().max(100).trim(),
-    workers: Joi.array().items(JoiValidId()),
+    employees: Joi.array().items(JoiValidId()),
   }),
   put: Joi.object().keys({
     name: Joi.string().min(2).max(100).trim(),
     link: Joi.string().uri().max(100).trim(),
-    workers: Joi.array().items(JoiValidId()),
+    employees: Joi.array().items(JoiValidId()),
   }),
 };

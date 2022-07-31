@@ -27,7 +27,7 @@ const schema = new Schema(
       trim: true,
       maxlength: 500,
     },
-    workers: [{
+    employees: [{
       role: {
         type: Schema.Types.String,
         enum: Object.values(USER_COMPANY_ROLE),

@@ -37,11 +37,6 @@ export const tokenInfo = {
 };
 export const logDirectory = process.env.LOG_DIR;
 
-export enum USER_ROLE {
-  admin = 'admin',
-  user = 'user'
-}
-
 export enum USER_COMPANY_ROLE {
   companyAdmin = 'companyAdmin',
   worker = 'worker'

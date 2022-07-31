@@ -44,8 +44,9 @@ router.put(
   validator(null, ValidationSource.PARAM),
   validator(schema.put, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    await Accessor.canUserUpdateCompany(req);
-    const updatedCompany = await CompanyService.updateById(req.params.id, req.body);
+    const [companyId, userId, isAdmin] = [req.params.id, req.user.id, req.user.isAdmin];
+    await Accessor.canUserUpdateCompany(companyId, userId, isAdmin);
+    const updatedCompany = await CompanyService.updateById(companyId, req.body);
     return SuccessResponse(res, 200, updatedCompany);
   }),
 );
@@ -55,8 +56,9 @@ router.delete(
   verifyToken,
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
-    await Accessor.canUserDeleteCompany(req);
-    const deletedCompany = await CompanyService.deleteById(req.params.id);
+    const [companyId, userId, isAdmin] = [req.params.id, req.user.id, req.user.isAdmin];
+    await Accessor.canUserDeleteCompany(companyId, userId, isAdmin);
+    const deletedCompany = await CompanyService.deleteById(companyId);
     return SuccessResponse(res, 200, deletedCompany);
   }),
 );
@@ -67,7 +69,8 @@ router.post(
   verifyToken,
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
-    Accessor.canUserInviteToCompany(req);
+    const [companyId, userId] = [req.params.id, req.user.id];
+    Accessor.canUserInviteToCompany(companyId, userId);
     // await CompanyService.inviteUser(req.params.userId, req.user.company);
     return SuccessResponse(res, 200);
   }),

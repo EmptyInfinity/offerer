@@ -36,18 +36,18 @@ export default class CompanyDbApi {
   /* CRUD END */
 
   public static async isUserInCompany(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
-    return !!(await CompanyModel.findOne({ id: companyId, 'workers.user': userId }).lean());
+    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId }).lean());
   }
 
   public static async isUserCompanyAdmin(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
-    return !!(await CompanyModel.findOne({ id: companyId, 'workers.user': userId, 'workers.role': USER_COMPANY_ROLE.companyAdmin }).lean());
+    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId, 'employees.role': USER_COMPANY_ROLE.companyAdmin }).lean());
   }
 
   // public static async addUser(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<ICompany | null> {
-  //   return CompanyModel.findByIdAndUpdate(companyId, { $addToSet: { workers: userId } }).exec();
+  //   return CompanyModel.findByIdAndUpdate(companyId, { $addToSet: { employees: userId } }).exec();
   // }
 
   // public static async removeUser(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<ICompany | null> {
-  //   return CompanyModel.findByIdAndUpdate(companyId, { $pull: { workers: userId } }).exec();
+  //   return CompanyModel.findByIdAndUpdate(companyId, { $pull: { employees: userId } }).exec();
   // }
 }

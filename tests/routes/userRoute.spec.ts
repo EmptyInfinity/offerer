@@ -104,7 +104,7 @@ describe('userRoute', () => {
         const userInDb = await UserService.getById(user.id);
         expect(userInDb.company.id).to.be.equal(company.id);
         const companyInDb = await CompanyService.getById(company.id);
-        expect(companyInDb.workers.length).to.be.equal(1);
+        expect(companyInDb.employees.length).to.be.equal(1);
         const companyInvitesInDb = await InviteService.getAll();
         expect(companyInvitesInDb.length).to.be.equal(0);
       });
@@ -121,7 +121,7 @@ describe('userRoute', () => {
         const userInDb = await UserService.getById(user.id);
         expect(userInDb.company).to.be.an('undefined');
         const companyInDb = await CompanyService.getById(company.id);
-        expect(companyInDb.workers.length).to.be.equal(0);
+        expect(companyInDb.employees.length).to.be.equal(0);
       });
       it('should return error (user already belongs company)', async () => {
         const company = await CompanyService.createOne(formCompany({}));
@@ -138,7 +138,7 @@ describe('userRoute', () => {
         const userInDb = await UserService.getById(user.id);
         expect(userInDb.company.name).to.be.equal(company.name);
         const companyInDb = await CompanyService.getById(company.id);
-        expect(companyInDb.workers.length).to.be.equal(1);
+        expect(companyInDb.employees.length).to.be.equal(1);
       });
     });
     describe('/users/leave-company', () => {
@@ -157,7 +157,7 @@ describe('userRoute', () => {
         const userInDb = await UserService.getById(user.id);
         expect(userInDb.company).to.be.equal(null);
         const companyInDb = await CompanyService.getById(company.id);
-        expect(companyInDb.workers.length).to.be.equal(0);
+        expect(companyInDb.employees.length).to.be.equal(0);
       });
       it('should return error (user does not belongs any company)', async () => {
         const { user } = await UserService.createOne(formUser({}));

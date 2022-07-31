@@ -43,7 +43,7 @@ router.get(
   '/',
   verifyToken,
   asyncHandler(async (req: Request, res: Response) => {
-    Accessor.canUserGetAllUsers(req);
+    Accessor.canUserGetAllUsers(req.user.isAdmin);
     const users: IUser[] = await UserService.getAll();
     return SuccessResponse(res, 200, users);
   }),
@@ -75,8 +75,9 @@ router.put(
   verifyToken,
   validator(schema.put, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    Accessor.canUserUpdateUser(req);
-    const updatedUser = await UserService.updateById(req.params.id, req.body);
+    const [reqUserId, targetUserId] = [req.user.id, req.params.id];
+    Accessor.canUserUpdateUser(reqUserId, targetUserId);
+    const updatedUser = await UserService.updateById(targetUserId, req.body);
     return SuccessResponse(res, 200, updatedUser);
   }),
 );
@@ -85,8 +86,9 @@ router.delete(
   '/:id',
   verifyToken,
   asyncHandler(async (req: Request, res: Response) => {
-    Accessor.canUserDeleteUser(req);
-    await UserService.deleteById(req.params.id);
+    const [reqUserId, targetUserId, isAdmin] = [req.user.id, req.params.id, req.user.isAdmin];
+    Accessor.canUserDeleteUser(reqUserId, targetUserId, isAdmin);
+    await UserService.deleteById(targetUserId);
     return SuccessResponse(res, 200);
   }),
 );
@@ -101,12 +103,13 @@ router.delete( // DEV-only
 );
 
 router.post(
-  '/join-company/:companyId',
+  '/join-company/:id',
   verifyToken,
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
-    Accessor.canUserJoinCompany(req);
-    await UserService.joinCompany(req.user.id, req.params.companyId);
+    const [companyId, userId] = [req.user.id, req.params.id];
+    Accessor.canUserJoinCompany(companyId, userId);
+    await UserService.joinCompany(userId, companyId);
     return SuccessResponse(res, 200);
   }),
 );

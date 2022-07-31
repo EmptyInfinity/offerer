@@ -20,7 +20,7 @@ export default class CompanyService {
   }
 
   public static async createOne(companyData: ICompany, creatorId: any): Promise<ICompany> {
-    const company: ICompany = { ...companyData, workers: [{ user: creatorId, role: USER_COMPANY_ROLE.companyAdmin }] };
+    const company: ICompany = { ...companyData, employees: [{ user: creatorId, role: USER_COMPANY_ROLE.companyAdmin }] };
     return CompanyApi.createOne(company);
   }
 

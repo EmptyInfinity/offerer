@@ -1,4 +1,4 @@
-import { USER_ROLE, USER_COMPANY_ROLE } from '../config';
+import { USER_COMPANY_ROLE } from '../config';
 
 export interface IUser {
   id?: any
@@ -7,7 +7,7 @@ export interface IUser {
   password?: string
   skills: string[]
   bio?: string
-  role: USER_ROLE
+  isAdmin: boolean
 }
 
 export interface ICompany {
@@ -15,7 +15,7 @@ export interface ICompany {
   name: string
   link?: URL
   description?: string
-  workers: { role: USER_COMPANY_ROLE, user: any | IUser }[]
+  employees: { role: USER_COMPANY_ROLE, user: any | IUser }[]
 }
 
 export interface IOffer {

@@ -1,5 +1,4 @@
 import { model, Schema, Document } from 'mongoose';
-import { USER_ROLE } from '../../../config';
 import { IUser } from '../../interfaces';
 
 const { Types } = Schema;
@@ -38,9 +37,8 @@ const schema = new Schema(
       trim: true,
       maxlength: 500,
     },
-    role: {
-      type: Types.String,
-      enum: Object.values(USER_ROLE),
+    isAdmin: {
+      type: Types.Boolean,
       required: true,
     },
   },

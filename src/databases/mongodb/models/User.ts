@@ -39,7 +39,7 @@ const schema = new Schema(
     },
     isAdmin: {
       type: Types.Boolean,
-      required: true,
+      default: false,
     },
   },
   {

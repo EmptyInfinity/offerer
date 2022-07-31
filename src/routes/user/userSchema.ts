@@ -1,7 +1,5 @@
 import Joi from '@hapi/joi';
-import { USER_ROLE } from '../../config';
 
-const validUserRoles = Object.keys(USER_ROLE);
 const validPassword = '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,50}$';
 
 export default {
@@ -10,7 +8,7 @@ export default {
       .trim(),
     email: Joi.string().required().email().max(100)
       .trim(),
-    role: Joi.string().required().valid(...validUserRoles),
+    isAdmin: Joi.boolean(),
     password: Joi.string().min(8).max(50).regex(RegExp(validPassword))
       .required()
       .trim()

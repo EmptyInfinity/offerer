@@ -36,8 +36,3 @@ export const tokenInfo = {
   audience: process.env.TOKEN_AUDIENCE || '',
 };
 export const logDirectory = process.env.LOG_DIR;
-
-export enum USER_COMPANY_ROLE {
-  companyAdmin = 'companyAdmin',
-  worker = 'worker'
-}

@@ -1,9 +1,19 @@
+import { ICompany, IUser } from '../src/databases/interfaces';
+
 export const formUser = ({
-  name = 'username', email = 'username@gmail.com', role = 'user', password = 'Password1',
-}): any => ({
-  name, email, role, password,
+  name = 'username',
+  email = 'username@gmail.com',
+  password = 'Password1',
+}) => ({
+  name,
+  email,
+  password,
 });
 
-export const formCompany = ({ name = 'companyName', link = 'https://company.com' }): any => ({
-  name, link,
+export const formCompany = ({
+  name = 'companyName',
+  link = 'https://company.com',
+}) => ({
+  name,
+  link,
 });

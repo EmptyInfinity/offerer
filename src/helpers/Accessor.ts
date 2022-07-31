@@ -29,18 +29,35 @@ export default class Accessor {
   }
 
   // users route
+  public static canUserCreateUser = (reqUserToken: string) => {
+    if (reqUserToken) throw new ForbiddenError('Logined user can\'t create other user!');
+  }
+
+  public static canUserGetUser = (reqUserId: any, targetUserId: any, isAdmin: boolean) => {
+    if (!isAdmin) {
+      if (reqUserId !== targetUserId) {
+        throw new ForbiddenError();
+      }
+    }
+  }
 
   public static canUserGetAllUsers = (isAdmin: boolean) => {
     if (isAdmin) throw new ForbiddenError();
   }
 
-  public static canUserUpdateUser = (reqUserId: any, targetUserId: any) => {
-    if (reqUserId !== targetUserId) throw new ForbiddenError();
+  public static canUserUpdateUser = (reqUserId: any, targetUserId: any, isAdmin: boolean) => {
+    if (!isAdmin) {
+      if (reqUserId !== targetUserId) {
+        throw new ForbiddenError();
+      }
+    }
   }
 
   public static canUserDeleteUser = (reqUserId: any, targetUserId: any, isAdmin: boolean) => {
-    if (!isAdmin || reqUserId !== targetUserId) {
-      throw new ForbiddenError();
+    if (!isAdmin) {
+      if (reqUserId !== targetUserId) {
+        throw new ForbiddenError();
+      }
     }
   }
 }

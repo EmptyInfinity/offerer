@@ -1,6 +1,6 @@
 /* eslint-disable import/no-dynamic-require */
 import { NotFoundError } from '../handlers/ApiError';
-import { dbDir, USER_COMPANY_ROLE } from '../config';
+import { dbDir } from '../config';
 import { ICompany, IInvite } from '../databases/interfaces';
 
 const dbPath = `../databases/${dbDir}`;
@@ -20,7 +20,7 @@ export default class CompanyService {
   }
 
   public static async createOne(companyData: ICompany, creatorId: any): Promise<ICompany> {
-    const company: ICompany = { ...companyData, employees: [{ user: creatorId, role: USER_COMPANY_ROLE.companyAdmin }] };
+    const company: ICompany = { ...companyData, employees: [{ user: creatorId, isAdmin: true }] };
     return CompanyApi.createOne(company);
   }
 

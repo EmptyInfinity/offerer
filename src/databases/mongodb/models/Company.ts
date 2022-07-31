@@ -1,7 +1,6 @@
 import {
   model, Schema, Document, Types,
 } from 'mongoose';
-import { USER_COMPANY_ROLE } from '../../../config';
 import { ICompany } from '../../interfaces';
 
 export const DOCUMENT_NAME = 'Company';
@@ -28,10 +27,9 @@ const schema = new Schema(
       maxlength: 500,
     },
     employees: [{
-      role: {
-        type: Schema.Types.String,
-        enum: Object.values(USER_COMPANY_ROLE),
-        required: true,
+      isAdmin: {
+        type: Schema.Types.Boolean,
+        default: false,
       },
       user: {
         type: Schema.Types.ObjectId,

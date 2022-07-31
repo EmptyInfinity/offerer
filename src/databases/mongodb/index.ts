@@ -31,6 +31,11 @@ export const normalized = (object: any) => {
   return object;
 };
 
+export const toJS = (object: any) => {
+  if (object) delete object._id;
+  return object;
+};
+
 
 // Create the database connection
 export const connectDB = () => {

@@ -1,6 +1,6 @@
 /* eslint-disable import/no-dynamic-require */
 import { genSalt, hash } from 'bcrypt';
-import { NotFoundError, ForbiddenError } from '../handlers/ApiError';
+import { NotFoundError, ForbiddenError, BadRequestError } from '../handlers/ApiError';
 import { dbDir } from '../config';
 import { IOffer, IUser } from '../databases/interfaces';
 import { createToken } from '../helpers';
@@ -13,7 +13,7 @@ const { default: InviteApi } = require(`${dbPath}/api/InviteApi`);
 
 export default class UserService {
   /* CRUD */
-  public static async getById(id: any): Promise<IUser | undefined> {
+  public static async getById(id: any): Promise<IUser | null> {
     const user: IUser | undefined = await UserApi.getById(id);
     if (!user) throw new NotFoundError('User not found!');
     return user;
@@ -23,13 +23,20 @@ export default class UserService {
     return UserApi.getAll();
   }
 
-  public static async createOne(userData: IUser): Promise<{ user: IUser, token: string }> {
-    const password = await this.hashPassword(userData.password);
-    const insertedUser = await UserApi.createOne({ ...userData, password });
-    const token = createToken(insertedUser.id);
-    const user: IUser = { id: insertedUser.id, ...userData };
-    delete user.password;
-    return { user, token };
+  public static async createOne(userData: any): Promise<{ user: IUser, token: string }> {
+    try {
+      const password = await this.hashPassword(userData.password);
+      const insertedUser = await UserApi.createOne({ ...userData, password });
+      const token = createToken(insertedUser.id);
+      const user: IUser = { id: insertedUser.id, ...userData };
+      delete user.password;
+      return { user, token };
+    } catch (error) {
+      if (error.message === `Email "${userData.email}" is already in use!`) {
+        throw new BadRequestError(error.message);
+      }
+      throw error;
+    }
   }
 
   public static updateById(id: any, userData: IUser): Promise<IUser | null> {
@@ -41,7 +48,7 @@ export default class UserService {
   }
   /* CRUD END */
 
-  public static async getUserByEmailWithPassword(email: string): Promise<IUser | undefined> {
+  public static async getUserByEmailWithPassword(email: string): Promise<IUser | null> {
     return UserApi.getUserByEmailWithPassword(email);
   }
 

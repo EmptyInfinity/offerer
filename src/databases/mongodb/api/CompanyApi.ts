@@ -1,7 +1,6 @@
 import { Types } from 'mongoose';
 import { CompanyModel } from '../models/Company';
 import { ICompany } from '../../interfaces';
-import { USER_COMPANY_ROLE } from '../../../config';
 // import { normalized } from '../index';
 
 export default class CompanyDbApi {
@@ -40,7 +39,7 @@ export default class CompanyDbApi {
   }
 
   public static async isUserCompanyAdmin(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
-    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId, 'employees.role': USER_COMPANY_ROLE.companyAdmin }).lean());
+    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId, 'employees.isAdmin': true }).lean());
   }
 
   // public static async addUser(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<ICompany | null> {

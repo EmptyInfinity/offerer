@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import { UserModel } from '../models/User';
 import { IUser } from '../../interfaces';
-// import { normalized } from '../index';
+import { normalized, toJS } from '../index';
 
 export default class UserDbApi {
   /* CRUD */
@@ -13,7 +13,7 @@ export default class UserDbApi {
     // const user: IUser | undefined = await UserModel.findById(id).lean<IUser>()
     //   .populate('company').populate('offers', '-_id');
     // return normalized(user);
-    return UserModel.findById(id).lean();
+    return UserModel.findById(id).lean({ virtuals: true }).then(toJS);
   }
 
   public static async getAll(): Promise<IUser[]> {
@@ -40,8 +40,7 @@ export default class UserDbApi {
   //   return UserModel.findByIdAndUpdate(userId, { $set: { company: companyId } }).exec();
   // }
 
-  // public static async getUserByEmailWithPassword(email: string): Promise<IUser | undefined> {
-  //   const user: IUser | undefined = await UserModel.findOne({ email }).lean<IUser>().select('+password');
-  //   return normalized(user);
-  // }
+  public static async getUserByEmailWithPassword(email: string): Promise<IUser | null> {
+    return UserModel.findOne({ email }).lean({ virtuals: true }).select('+password').then(toJS);
+  }
 }

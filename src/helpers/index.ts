@@ -1,7 +1,7 @@
 import { sign } from 'jsonwebtoken';
 
 export const isDir = (value: string): boolean => !value.split('.')[1];
-export const worldToPlural = (word: string):string => { // https://www.npmjs.com/package/pluralize can be used
+export const wordToPlural = (word: string): string => { // https://www.npmjs.com/package/pluralize can be used
   const lastLetter = word.slice(-1);
   if (lastLetter === 'y') return `${word.slice(0, -1)}ies`;
   return `${word}s`;

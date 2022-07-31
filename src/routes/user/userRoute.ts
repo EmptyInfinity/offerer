@@ -24,6 +24,8 @@ router.post(
   '/',
   validator(schema.post, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
+    const reqUserToken = req.header('auth-token');
+    Accessor.canUserCreateUser(reqUserToken);
     const { user, token } = await UserService.createOne(req.body);
     res.set({ 'auth-token': token });
     return SuccessResponse(res, 200, user);
@@ -65,6 +67,8 @@ router.get(
   verifyToken,
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
+    const [reqUserId, targetUserId, isAdmin] = [req.user.id, req.params.id, req.user.isAdmin];
+    Accessor.canUserGetUser(reqUserId, targetUserId, isAdmin);
     const user: IUser = await UserService.getById(req.params.id);
     return SuccessResponse(res, 200, user);
   }),
@@ -75,8 +79,8 @@ router.put(
   verifyToken,
   validator(schema.put, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    const [reqUserId, targetUserId] = [req.user.id, req.params.id];
-    Accessor.canUserUpdateUser(reqUserId, targetUserId);
+    const [reqUserId, targetUserId, isAdmin] = [req.user.id, req.params.id, req.user.isAdmin];
+    Accessor.canUserUpdateUser(reqUserId, targetUserId, isAdmin);
     const updatedUser = await UserService.updateById(targetUserId, req.body);
     return SuccessResponse(res, 200, updatedUser);
   }),

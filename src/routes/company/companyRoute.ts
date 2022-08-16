@@ -16,8 +16,9 @@ router.post(
   verifyToken,
   validator(schema.post, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    Accessor.canUserCreateCompany(req);
-    const company = await CompanyService.createOne(req.body);
+    const { isAdmin } = req.user;
+    await Accessor.canUserCreateCompany(isAdmin);
+    const company = await CompanyService.createOne(req.body, req.user.id);
     return SuccessResponse(res, 200, company);
   }),
 );
@@ -45,19 +46,22 @@ router.put(
   validator(null, ValidationSource.PARAM),
   validator(schema.put, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    Accessor.canUserUpdateCompany(req);
-    await CompanyService.updateById(req.params.id, req.body);
-    return SuccessResponse(res, 200);
+    const [companyId, userId, isAdmin] = [req.params.id, req.user.id, req.user.isAdmin];
+    await Accessor.canUserUpdateCompany(companyId, userId, isAdmin);
+    const updatedCompany = await CompanyService.updateById(companyId, req.body);
+    return SuccessResponse(res, 200, updatedCompany);
   }),
 );
 
 router.delete(
   '/:id',
+  verifyToken,
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
-    Accessor.canUserDeleteCompany(req);
-    await CompanyService.deleteById(req.params.id);
-    return SuccessResponse(res, 200);
+    const [companyId, userId, isAdmin] = [req.params.id, req.user.id, req.user.isAdmin];
+    await Accessor.canUserDeleteCompany(companyId, userId, isAdmin);
+    const deletedCompany = await CompanyService.deleteById(companyId);
+    return SuccessResponse(res, 200, deletedCompany);
   }),
 );
 /* CRUD END */
@@ -67,8 +71,9 @@ router.post(
   verifyToken,
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
-    Accessor.canUserInviteToCompany(req);
-    await CompanyService.inviteUser(req.params.userId, req.user.company);
+    const [companyId, userId] = [req.params.id, req.user.id];
+    Accessor.canUserInviteToCompany(companyId, userId);
+    // await CompanyService.inviteUser(req.params.userId, req.user.company);
     return SuccessResponse(res, 200);
   }),
 );

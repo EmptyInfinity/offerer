@@ -5,7 +5,6 @@ import { ForbiddenError, BadTokenError } from '../handlers/ApiError';
 import Logger from '../handlers/Logger';
 import { IUser } from '../databases/interfaces';
 
-
 declare global {
   namespace Express {
     interface Request {
@@ -29,6 +28,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     req.user = user;
     next();
   } catch (err) {
+    console.log(err);
     Logger.error(err);
     return next(new BadTokenError());
   }

@@ -1,5 +1,7 @@
+/* eslint-disable no-restricted-syntax */
 import mongoose from 'mongoose';
 import isPlainObject from 'lodash.isplainobject';
+import { object } from '@hapi/joi';
 import Logger from '../../handlers/Logger';
 import { getDbConfig } from '../../config';
 
@@ -7,30 +9,25 @@ let dbURI: string;
 
 const options = {
   useNewUrlParser: true,
-  useCreateIndex: true,
+  // useCreateIndex: true,
   useUnifiedTopology: true,
-  useFindAndModify: false,
+  // useFindAndModify: false,
   autoIndex: true,
-  poolSize: 10, // Maintain up to 10 socket connections
+  // poolSize: 10, // Maintain up to 10 socket connections
   // If not connected, return errors immediately rather than waiting for reconnect
-  bufferMaxEntries: 0,
+  // bufferMaxEntries: 0,
   connectTimeoutMS: 10000, // Give up initial connection after 10 seconds
   socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
 };
 
 export const isValidId = (id: string) => mongoose.isValidObjectId(id);
 export const isDbError = (error: any) => error.name === 'MongoError';
-export const normalized = (object: any) => {
-  if (!object) return undefined;
-  object.id = `${object._id}`;
-  delete object._id;
-  // eslint-disable-next-line no-restricted-syntax
-  for (const [key, value] of Object.entries(object)) {
-    if (isPlainObject(value)) object[key] = normalized(value);
+export const toJS = (obj: any) => {
+  if (obj) {
+    delete obj._id;
   }
-  return object;
+  return obj;
 };
-
 
 // Create the database connection
 export const connectDB = () => {

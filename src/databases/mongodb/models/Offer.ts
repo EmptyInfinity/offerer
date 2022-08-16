@@ -2,12 +2,10 @@ import { parseInt } from 'lodash';
 import { model, Schema, Document } from 'mongoose';
 import { IOffer } from '../../interfaces';
 
-
 const { Types } = Schema;
 export const DOCUMENT_NAME = 'Offer';
 export const COLLECTION_NAME = 'offers';
-export interface OfferDocument extends IOffer, Document {}
-const offerNameEnum = JSON.parse(process.env.OFFERS_ARRAY);
+export interface OfferDocument extends IOffer, Document { }
 const { OFFER_MIN_PRICE = '0', OFFER_MAX_PRICE = '10000' } = process.env;
 const offerMinPrice = parseInt(OFFER_MIN_PRICE);
 const offerMaxPrice = parseInt(OFFER_MAX_PRICE);
@@ -16,13 +14,12 @@ const schema = new Schema(
   {
     name: {
       type: Types.String,
-      enum: offerNameEnum,
       required: true,
       trim: true,
       minlength: 5,
       maxlength: 100,
     },
-    price: {
+    salary: {
       type: Types.Number,
       required: true,
       min: offerMinPrice,
@@ -33,6 +30,11 @@ const schema = new Schema(
       trim: true,
       minlength: 10,
       maxlength: 200,
+    },
+    company: {
+      type: Schema.Types.ObjectId,
+      ref: 'Company',
+      required: true,
     },
   },
   {

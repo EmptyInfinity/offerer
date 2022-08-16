@@ -1,31 +1,33 @@
-import { USER_ROLE, OFFER_NAME } from '../config';
-
 export interface IUser {
   id?: any
   name: string
-  email: string
+  email?: string
   password?: string
-  role: USER_ROLE
-  company?: any | ICompany,
-  offers: any | IOffer[]
+  skills: string[]
+  offers: string[]
+  bio?: string
+  isAdmin: boolean
 }
 
 export interface ICompany {
   id?: any
   name: string
   link?: URL
-  workers: any | IUser[]
+  description?: string
+  employees: { isAdmin: boolean, user: any | IUser }[]
 }
 
 export interface IOffer {
   id?: any
-  name: OFFER_NAME
-  price: number
+  name: string
+  salary: number
   description?: string
+  company: any | ICompany
 }
 
-export interface ICompanyInvite {
+export interface IInvite {
   id?: any
+  inviter: 'user' | 'company'
+  offer: any | IOffer
   user: any | IUser
-  company: any | ICompany
 }

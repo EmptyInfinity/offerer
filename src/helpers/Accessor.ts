@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import { ForbiddenError } from '../handlers/ApiError';
 import CompanyService from '../services/CompanyService';
 

@@ -1,9 +1,11 @@
-Accessor should be separated from Express
+end up API with tests
 
-add ability to set profile pic for users, add work examples, location on map
+add ability to set profile pic for users
 
 limit api requests per time
 
 add postgres implementation
 
 dockerize server
+
+experiment with project env and CI/CD 

@@ -1,19 +1,16 @@
 import { Types } from 'mongoose';
 import { UserModel } from '../models/User';
 import { IUser } from '../../interfaces';
-import { normalized, toJS } from '../index';
+import { toJS } from '../index';
 
 export default class UserDbApi {
   /* CRUD */
   public static async createOne(userData: IUser): Promise<IUser> {
-    return UserModel.create(userData);
+    return UserModel.create(userData).then((doc) => doc && doc.toObject());
   }
 
   public static async getById(id: Types.ObjectId): Promise<IUser | null> {
-    // const user: IUser | undefined = await UserModel.findById(id).lean<IUser>()
-    //   .populate('company').populate('offers', '-_id');
-    // return normalized(user);
-    return UserModel.findById(id).lean({ virtuals: true }).then(toJS);
+    return UserModel.findById(id).then((doc) => doc && doc.toObject());
   }
 
   public static async getAll(): Promise<IUser[]> {
@@ -24,7 +21,7 @@ export default class UserDbApi {
   }
 
   public static async updateById(id: Types.ObjectId, userData: IUser): Promise<IUser | null> {
-    return UserModel.findByIdAndUpdate(id, { $set: userData }, { new: true }).exec();
+    return UserModel.findByIdAndUpdate(id, { $set: userData }, { new: true }).then((doc) => doc && doc.toObject());
   }
 
   public static async deleteById(id: Types.ObjectId): Promise<IUser | null> {
@@ -41,6 +38,6 @@ export default class UserDbApi {
   // }
 
   public static async getUserByEmailWithPassword(email: string): Promise<IUser | null> {
-    return UserModel.findOne({ email }).lean({ virtuals: true }).select('+password').then(toJS);
+    return UserModel.findOne({ email }).select('+password').then((doc) => doc && doc.toObject());
   }
 }

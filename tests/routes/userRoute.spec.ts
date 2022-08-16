@@ -6,7 +6,8 @@ import getApp from '../../src/app';
 
 describe('userRoute', () => {
   let server: any;
-  beforeAll(async () => {
+  // eslint-disable-next-line no-undef
+  before(async () => {
     server = request(await getApp());
   });
   describe('/POST', () => {
@@ -20,7 +21,13 @@ describe('userRoute', () => {
         expect(headers['auth-token']).to.be.a('string');
         expect(headers['auth-token'].length > 100).to.be.equal(true);
         delete user.password;
-        expect(resUser).to.be.deep.equal({ ...user, id: resUser.id });
+        expect(resUser).to.be.deep.equal({
+          ...user,
+          id: resUser.id,
+          isAdmin: false,
+          offers: [],
+          skills: [],
+        });
 
         // DB validation
         const userInDb = await UserService.getById(resUser.id);
@@ -81,6 +88,147 @@ describe('userRoute', () => {
         // DB validation
         const usersInDb = await UserService.getAll();
         expect(usersInDb.length).to.be.deep.equal(1);
+      });
+    });
+    // describe('/users/join-company/:companyId', () => {
+    //   it('should successfully join user to company', async () => {
+    //     const company = await CompanyService.createOne(formCompany({}));
+    //     const { user } = await UserService.createOne(formUser({}));
+    //     await CompanyService.inviteUser(company.id, user.id);
+
+    //     const token = createToken(user.id);
+    //     const { body, status, headers } = await server.post(`/users/join-company/${company.id}`).set().set({ 'auth-token': token });
+    //     // response validation
+    //     expect(status).to.be.equal(200);
+    //     expect(headers['auth-token']).to.be.an('undefined');
+    //     expect(body).to.be.deep.equal({});
+    //     // DB validation
+    //     const userInDb = await UserService.getById(user.id);
+    //     expect(userInDb.company.id).to.be.equal(company.id);
+    //     const companyInDb = await CompanyService.getById(company.id);
+    //     expect(companyInDb.employees.length).to.be.equal(1);
+    //     const companyInvitesInDb = await InviteService.getAll();
+    //     expect(companyInvitesInDb.length).to.be.equal(0);
+    //   });
+    //   it('should return error (user was not invited)', async () => {
+    //     const company = await CompanyService.createOne(formCompany({}));
+    //     const { user } = await UserService.createOne(formUser({}));
+
+    //     const token = createToken(user.id);
+    //     const { body, status } = await server.post(`/users/join-company/${company.id}`).set().set({ 'auth-token': token });
+    //     // response validation
+    //     expect(status).to.be.equal(403);
+    //     expect(body.message).to.be.equal('Permission denied');
+    //     // DB validation
+    //     const userInDb = await UserService.getById(user.id);
+    //     expect(userInDb.company).to.be.an('undefined');
+    //     const companyInDb = await CompanyService.getById(company.id);
+    //     expect(companyInDb.employees.length).to.be.equal(0);
+    //   });
+    //   it('should return error (user already belongs company)', async () => {
+    //     const company = await CompanyService.createOne(formCompany({}));
+    //     const { user } = await UserService.createOne(formUser({}));
+    //     await CompanyService.inviteUser(company.id, user.id);
+    //     await UserService.joinCompany(user.id, company.id);
+
+    //     const token = createToken(user.id);
+    //     const { body, status } = await server.post(`/users/join-company/${company.id}`).set().set({ 'auth-token': token });
+    //     // response validation
+    //     expect(status).to.be.equal(403);
+    //     expect(body.message).to.be.equal('User already belongs company!');
+    //     // DB validation
+    //     const userInDb = await UserService.getById(user.id);
+    //     expect(userInDb.company.name).to.be.equal(company.name);
+    //     const companyInDb = await CompanyService.getById(company.id);
+    //     expect(companyInDb.employees.length).to.be.equal(1);
+    //   });
+    // });
+    // describe('/users/leave-company', () => {
+    //   it('should successfully remove user from company', async () => {
+    //     const company = await CompanyService.createOne(formCompany({}));
+    //     const { user } = await UserService.createOne(formUser({}));
+    //     await CompanyService.inviteUser(company.id, user.id);
+    //     await UserService.joinCompany(user.id, company.id);
+
+    //     const token = createToken(user.id);
+    //     const { body, status } = await server.post('/users/leave-company').set().set({ 'auth-token': token });
+    //     // response validation
+    //     expect(status).to.be.equal(200);
+    //     expect(body).to.be.deep.equal({});
+    //     // DB validation
+    //     const userInDb = await UserService.getById(user.id);
+    //     expect(userInDb.company).to.be.equal(null);
+    //     const companyInDb = await CompanyService.getById(company.id);
+    //     expect(companyInDb.employees.length).to.be.equal(0);
+    //   });
+    //   it('should return error (user does not belongs any company)', async () => {
+    //     const { user } = await UserService.createOne(formUser({}));
+
+    //     const token = createToken(user.id);
+    //     const { body, status } = await server.post('/users/leave-company').set().set({ 'auth-token': token });
+    //     // response validation
+    //     expect(status).to.be.equal(403);
+    //     expect(body.message).to.be.equal('User does not belongs any company!');
+    //     // DB validation
+    //     const userInDb = await UserService.getById(user.id);
+    //     expect(userInDb.company).to.be.an('undefined');
+    //   });
+    // });
+  });
+  describe('/PUT', () => {
+    describe('/users', () => {
+      it('should update user', async () => {
+        const user = formUser({});
+        const { user: createdUser, token } = await UserService.createOne(user);
+
+        const { body: resUser, status } = await server.put(`/users/${createdUser.id}`).set({ 'auth-token': token }).send({ name: 'John' });
+
+        // response validation
+        expect(status).to.be.equal(200);
+        delete user.password;
+        expect(resUser).to.be.deep.equal({
+          id: resUser.id,
+          name: 'John',
+          isAdmin: false,
+          offers: [],
+          skills: [],
+        });
+
+        // DB validation
+        const userInDb = await UserService.getById(resUser.id);
+        expect({ ...userInDb, email: user.email }).to.be.deep.equal({
+          ...resUser,
+          email: user.email,
+          skills: [],
+          offers: [],
+          isAdmin: false,
+          name: 'John',
+        });
+      });
+      it('should return error (validation with @hapi/joi)', async () => {
+        const user = formUser({});
+        delete user.name;
+
+        const { body, status } = await server.post('/users').send(user);
+        // response validation
+        expect(status).to.be.equal(400);
+        expect(body.message).to.be.equal('"name" is required');
+
+        // DB validation
+        const usersInDb = await UserService.getAll();
+        expect(usersInDb).to.be.deep.equal([]);
+      });
+      it('should return error (validation with @hapi/joi)', async () => {
+        const user = formUser({});
+
+        const { body, status } = await server.post('/users').send({ ...user, skills: [] });
+        // response validation
+        expect(status).to.be.equal(400);
+        expect(body.message).to.be.equal('"skills" is not allowed');
+
+        // DB validation
+        const usersInDb = await UserService.getAll();
+        expect(usersInDb).to.be.deep.equal([]);
       });
     });
     describe('/login', () => {
@@ -223,7 +371,7 @@ describe('userRoute', () => {
         // DB validation
         let errMsg;
         try {
-          await expect(await UserService.getById(user.id)).to.be.rejectedWith('User not found!');
+          await UserService.getById(user.id);
         } catch (error) {
           errMsg = error.message;
         }

@@ -21,7 +21,8 @@ export default class CompanyService {
 
   public static async createOne(companyData: ICompany, creatorId: any): Promise<ICompany> {
     const company: ICompany = { ...companyData, employees: [{ user: creatorId, isAdmin: true }] };
-    return CompanyApi.createOne(company);
+    const insertedCompany = await CompanyApi.createOne(company);
+    return { id: insertedCompany.id, ...company };
   }
 
   public static async updateById(id: any, companyData: ICompany): Promise<ICompany | null> {

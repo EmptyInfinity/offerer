@@ -1,5 +1,7 @@
+/* eslint-disable no-restricted-syntax */
 import mongoose from 'mongoose';
 import isPlainObject from 'lodash.isplainobject';
+import { object } from '@hapi/joi';
 import Logger from '../../handlers/Logger';
 import { getDbConfig } from '../../config';
 
@@ -20,22 +22,12 @@ const options = {
 
 export const isValidId = (id: string) => mongoose.isValidObjectId(id);
 export const isDbError = (error: any) => error.name === 'MongoError';
-export const normalized = (object: any) => {
-  if (!object) return undefined;
-  object.id = `${object._id}`;
-  delete object._id;
-  // eslint-disable-next-line no-restricted-syntax
-  for (const [key, value] of Object.entries(object)) {
-    if (isPlainObject(value)) object[key] = normalized(value);
+export const toJS = (obj: any) => {
+  if (obj) {
+    delete obj._id;
   }
-  return object;
+  return obj;
 };
-
-export const toJS = (object: any) => {
-  if (object) delete object._id;
-  return object;
-};
-
 
 // Create the database connection
 export const connectDB = () => {

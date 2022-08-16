@@ -1,5 +1,4 @@
 import { model, Schema, Document } from 'mongoose';
-import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 import { IUser } from '../../interfaces';
 
 const { Types } = Schema;
@@ -51,10 +50,7 @@ const schema = new Schema(
     versionKey: false,
   },
 );
-// schema.set('toJSON', {
-//   virtuals: true,
-//   transform(doc, ret) { delete ret._id; },
-// });
+
 schema.post('save', (error: any, { email }: UserDocument, next: any) => {
   if (error.name === 'MongoServerError' && error.code === 11000) {
     next(new Error(`Email "${email}" is already in use!`));
@@ -63,13 +59,13 @@ schema.post('save', (error: any, { email }: UserDocument, next: any) => {
   }
 });
 
-
-// schema.virtual('id').get(function () {
-//   const objectId: any = this._id;
-//   // delete this._id;
-//   return objectId;
-// });
-
-schema.plugin(mongooseLeanVirtuals);
+// @ts-ignore
+if (!schema.options.toObject) schema.options.toObject = {};
+// @ts-ignore
+schema.options.toObject.transform = function (doc, ret, options) {
+  ret.id = ret._id.toString();
+  delete ret._id;
+  return ret;
+};
 
 export const UserModel = model<UserDocument>(DOCUMENT_NAME, schema, COLLECTION_NAME);

@@ -16,6 +16,8 @@ router.post(
   verifyToken,
   validator(schema.post, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
+    const { isAdmin } = req.user;
+    await Accessor.canUserCreateCompany(isAdmin);
     const company = await CompanyService.createOne(req.body, req.user.id);
     return SuccessResponse(res, 200, company);
   }),

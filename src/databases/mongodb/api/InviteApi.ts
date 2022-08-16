@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import { InviteModel } from '../models/Invite';
 import { IInvite } from '../../interfaces';
-import { normalized } from '../index';
+import { toJS } from '../index';
 
 export default class CompanyInvoiceDbApi {
   /* CRUD */

@@ -1,5 +1,4 @@
 import Joi from '@hapi/joi';
-import { IUser } from '../../databases/interfaces';
 
 const validPassword = '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,50}$';
 

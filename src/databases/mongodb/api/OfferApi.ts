@@ -6,7 +6,7 @@ import { IOffer } from '../../interfaces';
 export default class OfferDbApi {
   /* CRUD */
   public static async createOne(offerData: IOffer): Promise<IOffer> {
-    return OfferModel.create(offerData);
+    return OfferModel.create(offerData).then((doc) => doc && doc.toObject());
   }
 
   public static async getById(id: Types.ObjectId): Promise<IOffer | null> {

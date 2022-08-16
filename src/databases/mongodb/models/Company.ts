@@ -1,6 +1,4 @@
-import {
-  model, Schema, Document, Types,
-} from 'mongoose';
+import { model, Schema, Document } from 'mongoose';
 import { ICompany } from '../../interfaces';
 
 export const DOCUMENT_NAME = 'Company';
@@ -43,11 +41,17 @@ const schema = new Schema(
     versionKey: false,
   },
 );
-schema.set('toJSON', {
-  virtuals: true,
-  transform(doc, ret) {
-    delete ret._id;
-  },
-});
+
+// @ts-ignore
+if (!schema.options.toObject) schema.options.toObject = {};
+// @ts-ignore
+schema.options.toObject.transform = function (doc, ret, options) {
+  ret.id = ret._id.toString();
+  ret.employees.forEach((empl: any) => {
+    empl.user = `${empl.user}`;
+  });
+  delete ret._id;
+  return ret;
+};
 
 export const CompanyModel = model<CompanyDocument>(DOCUMENT_NAME, schema, COLLECTION_NAME);

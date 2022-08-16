@@ -113,7 +113,7 @@ router.post(
   asyncHandler(async (req: Request, res: Response) => {
     const [companyId, userId] = [req.user.id, req.params.id];
     Accessor.canUserJoinCompany(companyId, userId);
-    await UserService.joinCompany(userId, companyId);
+    // await UserService.joinCompany(userId, companyId);
     return SuccessResponse(res, 200);
   }),
 );

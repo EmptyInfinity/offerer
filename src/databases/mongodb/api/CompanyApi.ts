@@ -1,7 +1,6 @@
 import { Types } from 'mongoose';
 import { CompanyModel } from '../models/Company';
 import { ICompany } from '../../interfaces';
-// import { normalized } from '../index';
 
 export default class CompanyDbApi {
   public static async isExists(_id: Types.ObjectId): Promise<any> {
@@ -10,13 +9,11 @@ export default class CompanyDbApi {
 
   /* CRUD */
   public static async createOne(companyData: ICompany): Promise<ICompany> {
-    return CompanyModel.create(companyData);
+    return CompanyModel.create(companyData).then((doc) => doc && doc.toObject());
   }
 
-  public static async getById(id: Types.ObjectId): Promise<ICompany | null> {
-    // const company: ICompany | undefined = await CompanyModel.findById(id).lean<ICompany>();
-    // return normalized(company);
-    return CompanyModel.findById(id).lean();
+  public static async getById(id: Types.ObjectId): Promise<any> {
+    return CompanyModel.findById(id).then((doc) => doc && doc.toObject());
   }
 
   public static async getAll(): Promise<ICompany[]> {

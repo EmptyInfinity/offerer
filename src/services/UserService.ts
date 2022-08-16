@@ -6,6 +6,9 @@ import { IOffer, IUser } from '../databases/interfaces';
 import { createToken } from '../helpers';
 import CompanyService from './CompanyService';
 
+// import UserApi from '../databases/mongodb/api/UserApi';
+// import OfferApi from '../databases/mongodb/api/OfferApi';
+// import InviteApi from '../databases/mongodb/api/InviteApi';
 const dbPath = `../databases/${dbDir}`;
 const { default: UserApi } = require(`${dbPath}/api/UserApi`);
 const { default: OfferApi } = require(`${dbPath}/api/OfferApi`);
@@ -28,9 +31,8 @@ export default class UserService {
       const password = await this.hashPassword(userData.password);
       const insertedUser = await UserApi.createOne({ ...userData, password });
       const token = createToken(insertedUser.id);
-      const user: IUser = { id: insertedUser.id, ...userData };
-      delete user.password;
-      return { user, token };
+      delete insertedUser.password;
+      return { user: insertedUser, token };
     } catch (error) {
       if (error.message === `Email "${userData.email}" is already in use!`) {
         throw new BadRequestError(error.message);
@@ -56,13 +58,13 @@ export default class UserService {
     return UserApi.deleteAll();
   }
 
-  public static async joinCompany(userId: any, companyId: any): Promise<IUser | null> {
-    const invite = await InviteApi.getOne({ user: userId, company: companyId });
-    if (!invite) throw new ForbiddenError();
-    // await CompanyService.addUser(companyId, userId);
-    await InviteApi.deleteById(invite.id);
-    return UserApi.joinCompany(userId, companyId);
-  }
+  // public static async joinCompany(userId: any, companyId: any): Promise<IUser | null> {
+  //   const invite = await InviteApi.getOne({ user: userId, company: companyId });
+  //   if (!invite) throw new ForbiddenError();
+  //   // await CompanyService.addUser(companyId, userId);
+  //   await InviteApi.deleteById(invite.id);
+  //   return UserApi.joinCompany(userId, companyId);
+  // }
 
   // public static async leaveCompany(user: IUser): Promise<IUser | null> {
   // await CompanyService.removeUser(user.company.id, user.id);

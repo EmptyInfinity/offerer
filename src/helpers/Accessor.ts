@@ -7,6 +7,7 @@ export default class Accessor {
 
   private static isUserInCompany = async (companyId: any, userId: any) => CompanyService.isUserInCompany(companyId, userId);
 
+  // companies route
   public static canUserCreateCompany = (isAdmin: boolean) => {
     if (isAdmin) throw new ForbiddenError('Admin can\'t create companies!');
   }

@@ -1,5 +1,6 @@
 import { sign } from 'jsonwebtoken';
 
+export const capitalize = (s: string) => s && s[0].toUpperCase() + s.slice(1);
 export const isDir = (value: string): boolean => !value.split('.')[1];
 export const wordToPlural = (word: string): string => { // https://www.npmjs.com/package/pluralize can be used
   const lastLetter = word.slice(-1);

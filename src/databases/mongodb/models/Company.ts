@@ -1,5 +1,7 @@
 import { model, Schema, Document } from 'mongoose';
 import { ICompany } from '../../interfaces';
+import { capitalize } from '../../../helpers';
+import { DuplicatedFieldError } from '../../common';
 
 export const DOCUMENT_NAME = 'Company';
 export const COLLECTION_NAME = 'companies';
@@ -41,6 +43,15 @@ const schema = new Schema(
     versionKey: false,
   },
 );
+
+schema.post('save', (error: any, company: any, next: any) => {
+  if (error.name === 'MongoServerError' && error.code === 11000) {
+    const duplicatedField = Object.keys(error.keyPattern)[0];
+    next(new DuplicatedFieldError(`${capitalize(duplicatedField)} "${company[duplicatedField]}" is already in use!`));
+  } else {
+    next();
+  }
+});
 
 // @ts-ignore
 if (!schema.options.toObject) schema.options.toObject = {};

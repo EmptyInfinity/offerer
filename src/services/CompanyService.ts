@@ -1,7 +1,8 @@
 /* eslint-disable import/no-dynamic-require */
-import { NotFoundError } from '../handlers/ApiError';
+import { NotFoundError, BadRequestError } from '../handlers/ApiError';
 import { dbDir } from '../config';
 import { ICompany, IInvite } from '../databases/interfaces';
+import { DuplicatedFieldError } from '../databases/common';
 
 const dbPath = `../databases/${dbDir}`;
 const { default: CompanyApi } = require(`${dbPath}/api/CompanyApi`);
@@ -20,9 +21,16 @@ export default class CompanyService {
   }
 
   public static async createOne(companyData: ICompany, creatorId: any): Promise<ICompany> {
-    const company: ICompany = { ...companyData, employees: [{ user: creatorId, isAdmin: true }] };
-    const insertedCompany = await CompanyApi.createOne(company);
-    return { id: insertedCompany.id, ...company };
+    try {
+      const company: ICompany = { ...companyData, employees: [{ user: creatorId, isAdmin: true }] };
+      const insertedCompany = await CompanyApi.createOne(company);
+      return { id: insertedCompany.id, ...company };
+    } catch (error) {
+      if (error instanceof DuplicatedFieldError) {
+        throw new BadRequestError(error.message);
+      }
+      throw error;
+    }
   }
 
   public static async updateById(id: any, companyData: ICompany): Promise<ICompany | null> {

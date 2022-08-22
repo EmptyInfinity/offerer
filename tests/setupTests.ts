@@ -1,13 +1,6 @@
 import { config } from 'dotenv';
 import mongoose from 'mongoose';
-import request from 'supertest';
 import { dbDir } from '../src/config';
-import getApp from '../src/app';
-
-// interface Global {
-//   server: any;
-// }
-// export declare const global: Global;
 
 const dbPath = `../src/databases/${dbDir}`;
 // eslint-disable-next-line import/no-dynamic-require
@@ -19,10 +12,7 @@ export const mochaHooks = (): Mocha.RootHookObject => ({
     process.env.NODE_ENV = 'test';
     process.env.DB_NAME = 'tests-db';
     connectDB();
-    // global.server = request(await getApp());
   },
-  // async beforeEach(this: any) {
-  // },
   async afterAll(this: any) {
     await mongoose.connection.close();
   },

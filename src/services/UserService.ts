@@ -5,7 +5,7 @@ import { dbDir } from '../config';
 import { IOffer, IUser } from '../databases/interfaces';
 import { createToken } from '../helpers';
 import CompanyService from './CompanyService';
-import { DuplicatedFieldError } from '../databases/common';
+import { DBDuplicatedFieldError } from '../databases/common';
 
 // import UserApi from '../databases/mongodb/api/UserApi';
 // import OfferApi from '../databases/mongodb/api/OfferApi';
@@ -35,7 +35,7 @@ export default class UserService {
       delete insertedUser.password;
       return { user: insertedUser, token };
     } catch (error) {
-      if (error instanceof DuplicatedFieldError) {
+      if (error instanceof DBDuplicatedFieldError) {
         throw new BadRequestError(error.message);
       }
       throw error;

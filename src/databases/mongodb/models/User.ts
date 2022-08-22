@@ -1,6 +1,6 @@
 import { model, Schema, Document } from 'mongoose';
 import { IUser } from '../../interfaces';
-import { DuplicatedFieldError } from '../../common';
+import { DBDuplicatedFieldError } from '../../common';
 
 const { Types } = Schema;
 export const DOCUMENT_NAME = 'User';
@@ -54,7 +54,7 @@ const schema = new Schema(
 
 schema.post('save', (error: any, { email }: UserDocument, next: any) => {
   if (error.name === 'MongoServerError' && error.code === 11000) {
-    next(new DuplicatedFieldError(`Email "${email}" is already in use!`));
+    next(new DBDuplicatedFieldError(`Email "${email}" is already in use!`));
   } else {
     next();
   }

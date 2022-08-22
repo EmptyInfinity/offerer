@@ -1,7 +1,7 @@
 import { model, Schema, Document } from 'mongoose';
 import { ICompany } from '../../interfaces';
 import { capitalize } from '../../../helpers';
-import { DuplicatedFieldError } from '../../common';
+import { DBDuplicatedFieldError } from '../../common';
 
 export const DOCUMENT_NAME = 'Company';
 export const COLLECTION_NAME = 'companies';
@@ -44,10 +44,19 @@ const schema = new Schema(
   },
 );
 
+schema.post('findOneAndUpdate', (error: any, _company: any, next: any) => {
+  if (error.name === 'MongoServerError' && error.code === 11000) {
+    const duplicatedField = Object.keys(error.keyPattern)[0];
+    next(new DBDuplicatedFieldError(`${capitalize(duplicatedField)} "${error.keyValue[duplicatedField]}" is already in use!`));
+  } else {
+    next();
+  }
+});
+
 schema.post('save', (error: any, company: any, next: any) => {
   if (error.name === 'MongoServerError' && error.code === 11000) {
     const duplicatedField = Object.keys(error.keyPattern)[0];
-    next(new DuplicatedFieldError(`${capitalize(duplicatedField)} "${company[duplicatedField]}" is already in use!`));
+    next(new DBDuplicatedFieldError(`${capitalize(duplicatedField)} "${company[duplicatedField]}" is already in use!`));
   } else {
     next();
   }

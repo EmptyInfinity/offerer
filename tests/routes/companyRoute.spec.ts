@@ -13,7 +13,7 @@ describe('companyRoute', () => {
   });
   describe('/POST', () => {
     describe('/companies', () => {
-      it('should add user', async () => {
+      it('should add company', async () => {
         const { user, token } = await UserService.createOne(formUser({}));
         const company = formCompany({});
 
@@ -97,54 +97,58 @@ describe('companyRoute', () => {
   });
   describe('/PUT', () => {
     describe('/companies', () => {
-      it.only('should update user', async () => {
+      it('should update company', async () => {
         const { user, token } = await UserService.createOne(formUser({}));
         const company = await CompanyService.createOne(formCompany({}) as any, user.id);
 
-        const { body: resCompany, status } = await server.post('/companies').set({ 'auth-token': token }).send({ name: 'new name' });
+        const { body: resCompany, status } = await server.put(`/companies/${company.id}`).set({ 'auth-token': token }).send({ name: 'new name' });
         // response validation
         expect(status).to.be.equal(200);
-        console.log(company, resCompany);
-
-        // expect(resCompany).to.be.deep.equal({
-        //   ...company,
-        //   name: 'new name',
-        //   id: resCompany.id,
-        //   employees: [{ isAdmin: true, user: user.id }],
-        // });
+        expect(resCompany).to.be.deep.equal({ ...company, name: 'new name' });
 
         // DB validation
         const companyInDb = await CompanyService.getById(resCompany.id);
         expect(companyInDb).to.be.deep.equal(resCompany);
       });
+      it('should throw error: company is not found', async () => {
+        const { user, token } = await UserService.createOne(formUser({}));
+
+        const { body, status } = await server.put(`/companies/${user.id}`).set({ 'auth-token': token }).send({ name: 'new name' });
+        // response validation
+        expect(status).to.be.equal(404);
+        expect(body.message).to.be.equal(`Company with id "${user.id}" is not found!`);
+
+        // DB validation
+        const companyInDb = await CompanyService.getAll();
+        expect(companyInDb.length).to.be.equal(0);
+      });
       it('should throw error, duplicated name', async () => {
         const { user, token } = await UserService.createOne(formUser({}));
-        const company: any = formCompany({});
-        await CompanyService.createOne(company, user.id);
+        const company = await CompanyService.createOne(formCompany({}) as any, user.id);
+        const company2 = await CompanyService.createOne({ name: 'c2', link: 'https://ac.me' } as any, user.id);
 
-        const { body, status } = await server.post('/companies').set({ 'auth-token': token }).send(company);
+        const { body, status } = await server.put(`/companies/${company2.id}`).set({ 'auth-token': token }).send({ name: company.name });
         // response validation
         expect(status).to.be.equal(400);
-
         expect(body.message).to.be.equal(`Name "${company.name}" is already in use!`);
 
         // DB validation
         const companiesInDb = await CompanyService.getAll();
-        expect(companiesInDb.length).to.be.equal(1);
+        expect(companiesInDb.length).to.be.equal(2);
       });
-      it('should throw error, duplicated link', async () => {
+      it.only('should throw error, duplicated link', async () => {
         const { user, token } = await UserService.createOne(formUser({}));
-        const company: any = formCompany({});
-        await CompanyService.createOne(company, user.id);
+        const company = await CompanyService.createOne(formCompany({}) as any, user.id);
+        const company2 = await CompanyService.createOne({ name: 'c2', link: 'https://ac.me' } as any, user.id);
 
-        const { body, status } = await server.post('/companies').set({ 'auth-token': token }).send({ ...company, name: 'anotherName' });
+        const { body, status } = await server.put(`/companies/${company2.id}`).set({ 'auth-token': token }).send({ link: company.link });
         // response validation
         expect(status).to.be.equal(400);
         expect(body.message).to.be.equal(`Link "${company.link}" is already in use!`);
 
         // DB validation
         const companiesInDb = await CompanyService.getAll();
-        expect(companiesInDb.length).to.be.equal(1);
+        expect(companiesInDb.length).to.be.equal(2);
       });
       it('should throw error, missing required field', async () => {
         const { token } = await UserService.createOne(formUser({}));

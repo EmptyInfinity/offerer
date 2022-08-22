@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import { CompanyModel } from '../models/Company';
 import { ICompany } from '../../interfaces';
+import { DBNotFoundError } from '../../common';
 
 export default class CompanyDbApi {
   public static async isExists(_id: Types.ObjectId): Promise<any> {
@@ -23,7 +24,12 @@ export default class CompanyDbApi {
   }
 
   public static async updateById(id: Types.ObjectId, companyData: ICompany): Promise<ICompany | null> {
-    return CompanyModel.findByIdAndUpdate(id, { $set: companyData }, { new: true }).exec();
+    return CompanyModel.findByIdAndUpdate(id, { $set: companyData }, { new: true }).then((doc) => {
+      if (doc) {
+        return doc.toObject();
+      }
+      throw new DBNotFoundError(`Company with id "${id}" is not found!`);
+    });
   }
 
   public static async deleteById(id: Types.ObjectId): Promise<ICompany | null> {
@@ -36,7 +42,12 @@ export default class CompanyDbApi {
   }
 
   public static async isUserCompanyAdmin(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
-    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId, 'employees.isAdmin': true }).lean());
+    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId, 'employees.isAdmin': true }).then((doc) => {
+      if (doc) {
+        return doc.toObject();
+      }
+      throw new DBNotFoundError(`Company with id "${companyId}" is not found!`);
+    }));
   }
 
   // public static async addUser(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<ICompany | null> {

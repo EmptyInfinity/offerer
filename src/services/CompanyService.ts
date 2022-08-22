@@ -2,7 +2,7 @@
 import { NotFoundError, BadRequestError } from '../handlers/ApiError';
 import { dbDir } from '../config';
 import { ICompany, IInvite } from '../databases/interfaces';
-import { DuplicatedFieldError } from '../databases/common';
+import { DBDuplicatedFieldError, DBNotFoundError } from '../databases/common';
 
 const dbPath = `../databases/${dbDir}`;
 const { default: CompanyApi } = require(`${dbPath}/api/CompanyApi`);
@@ -26,18 +26,20 @@ export default class CompanyService {
       const insertedCompany = await CompanyApi.createOne(company);
       return { id: insertedCompany.id, ...company };
     } catch (error) {
-      if (error instanceof DuplicatedFieldError) {
-        throw new BadRequestError(error.message);
-      }
+      if (error instanceof DBDuplicatedFieldError) throw new BadRequestError(error.message);
       throw error;
     }
   }
 
   public static async updateById(id: any, companyData: ICompany): Promise<ICompany | null> {
-    if (!await CompanyApi.isExists(id)) {
-      throw new NotFoundError(`Company "${id}" is not found!`);
+    try {
+      const updatedCompany = await CompanyApi.updateById(id, companyData);
+      return updatedCompany;
+    } catch (error) {
+      if (error instanceof DBDuplicatedFieldError) throw new BadRequestError(error.message);
+      if (error instanceof DBNotFoundError) throw new NotFoundError(error.message);
+      throw error;
     }
-    return CompanyApi.updateById(id, companyData);
   }
 
   public static async deleteById(id: any): Promise<ICompany> {
@@ -53,7 +55,13 @@ export default class CompanyService {
   }
 
   public static async isUserCompanyAdmin(companyId: any, userId: any): Promise<boolean> {
-    return CompanyApi.isUserCompanyAdmin(companyId, userId);
+    try {
+      const company = await CompanyApi.isUserCompanyAdmin(companyId, userId);
+      return company;
+    } catch (error) {
+      if (error instanceof DBNotFoundError) throw new NotFoundError(error.message);
+      throw error;
+    }
   }
 
   // public static async inviteUser(companyId: any, userId: any): Promise<IInvite> {

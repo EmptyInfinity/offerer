@@ -4,6 +4,10 @@ import { IUser } from '../../interfaces';
 
 export default class UserDbApi {
   /* CRUD */
+  public static async isExists(_id: Types.ObjectId): Promise<any> {
+    return UserModel.exists({ _id });
+  }
+
   public static async createOne(userData: IUser): Promise<IUser> {
     return UserModel.create(userData).then((doc) => doc && doc.toObject());
   }
@@ -21,7 +25,7 @@ export default class UserDbApi {
   }
 
   public static async deleteById(id: Types.ObjectId): Promise<IUser | null> {
-    return UserModel.findByIdAndDelete(id).then((doc) => doc && doc.toObject());
+    return UserModel.findByIdAndDelete(id).select('-password').then((doc) => doc && doc.toObject());
   }
 
   /* CRUD END */

@@ -15,6 +15,10 @@ import InviteApi from '../databases/mongodb/api/InviteApi';
 
 export default class UserService {
   /* CRUD */
+  public static async isExists(id: any): Promise<boolean> {
+    return UserApi.isExists(id);
+  }
+
   public static async getById(id: any): Promise<IUser> {
     const user: IUser = await UserApi.getById(id);
     if (!user) throw new NotFoundError(`User with id "${id}" is not found!`);

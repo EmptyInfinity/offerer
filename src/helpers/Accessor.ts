@@ -1,12 +1,8 @@
-import { ForbiddenError } from '../handlers/ApiError';
+import { ForbiddenError, NotFoundError } from '../handlers/ApiError';
 import CompanyService from '../services/CompanyService';
 import UserService from '../services/UserService';
 
 export default class Accessor {
-  private static isUserCompanyAdmin = async (companyId: any, userId: any) => CompanyService.isUserCompanyAdmin(companyId, userId);
-
-  // private static isUserInCompany = async (companyId: any, userId: any) => CompanyService.isUserInCompany(companyId, userId);
-
   // companies route
   public static canUserCreateCompany = (isAdmin: boolean) => {
     if (isAdmin) throw new ForbiddenError('Admin can\'t create companies!');
@@ -14,7 +10,13 @@ export default class Accessor {
 
   public static canUserUpdateCompany = async (companyId: any, userId: any, isAdmin: boolean) => {
     if (!isAdmin) {
-      if (!await this.isUserCompanyAdmin(companyId, userId)) throw new ForbiddenError();
+      const isCompanyAdmin = await CompanyService.isUserCompanyAdmin(companyId, userId);
+      if (!isCompanyAdmin) {
+        if (await CompanyService.isExists(companyId)) {
+          throw new ForbiddenError();
+        }
+        throw new NotFoundError(`Company with id "${companyId}" is not found!`);
+      }
     }
   }
 
@@ -26,7 +28,13 @@ export default class Accessor {
   public static canUserDeleteCompany = async (companyId: any, userId: any, isAdmin: boolean) => this.canUserUpdateCompany(companyId, userId, isAdmin);
 
   public static canUserInviteToCompany = async (companyId: any, userId: any) => {
-    if (!await this.isUserCompanyAdmin(companyId, userId)) throw new ForbiddenError();
+    const isCompanyAdmin = await CompanyService.isUserCompanyAdmin(companyId, userId);
+    if (!isCompanyAdmin) {
+      if (await CompanyService.isExists(companyId)) {
+        throw new ForbiddenError();
+      }
+      throw new NotFoundError(`Company with id "${companyId}" is not found!`);
+    }
   }
 
   // users route
@@ -37,8 +45,10 @@ export default class Accessor {
   public static canUserGetUser = async (reqUserId: any, targetUserId: any, isAdmin: boolean) => {
     if (!isAdmin) {
       if (reqUserId !== targetUserId) {
-        await UserService.getById(targetUserId);
-        throw new ForbiddenError();
+        if (await UserService.isExists(targetUserId)) {
+          throw new ForbiddenError();
+        }
+        throw new NotFoundError(`User with id "${targetUserId}" is not found!`);
       }
     }
   }
@@ -47,21 +57,7 @@ export default class Accessor {
     if (isAdmin) throw new ForbiddenError();
   }
 
-  public static canUserUpdateUser = async (reqUserId: any, targetUserId: any, isAdmin: boolean) => {
-    if (!isAdmin) {
-      if (reqUserId !== targetUserId) {
-        await UserService.getById(targetUserId);
-        throw new ForbiddenError();
-      }
-    }
-  }
+  public static canUserUpdateUser = async (reqUserId: any, targetUserId: any, isAdmin: boolean) => this.canUserGetUser(reqUserId, targetUserId, isAdmin);
 
-  public static canUserDeleteUser = async (reqUserId: any, targetUserId: any, isAdmin: boolean) => {
-    if (!isAdmin) {
-      if (reqUserId !== targetUserId) {
-        await UserService.getById(targetUserId);
-        throw new ForbiddenError();
-      }
-    }
-  }
+  public static canUserDeleteUser = async (reqUserId: any, targetUserId: any, isAdmin: boolean) => this.canUserGetUser(reqUserId, targetUserId, isAdmin);
 }

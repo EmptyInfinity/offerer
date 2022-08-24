@@ -110,7 +110,37 @@ describe('companyRoute', () => {
         const companyInDb = await CompanyService.getById(resCompany.id);
         expect(companyInDb).to.be.deep.equal(resCompany);
       });
-      it('should throw error: company is not found', async () => {
+      it('should update company (as admin)', async () => {
+        const { user } = await UserService.createOne(formUser({}));
+        const { token } = await UserService.createOne({
+          name: 'us', email: 'user@email.com', password: 'secure', isAdmin: true,
+        });
+        const company = await CompanyService.createOne(formCompany({}) as any, user.id);
+
+        const { body: resCompany, status } = await server.put(`/companies/${company.id}`).set({ 'auth-token': token }).send({ name: 'new name' });
+        // response validation
+        expect(status).to.be.equal(200);
+        expect(resCompany).to.be.deep.equal({ ...company, name: 'new name' });
+
+        // DB validation
+        const companyInDb = await CompanyService.getById(resCompany.id);
+        expect(companyInDb).to.be.deep.equal(resCompany);
+      });
+      it('should throw error, not company admin', async () => {
+        const { user } = await UserService.createOne(formUser({}));
+        const { token } = await UserService.createOne({ name: 'us', email: 'user@email.com', password: 'secure' });
+        const company = await CompanyService.createOne(formCompany({}) as any, user.id);
+
+        const { body, status } = await server.put(`/companies/${company.id}`).set({ 'auth-token': token }).send({ name: 'new name' });
+        // response validation
+        expect(status).to.be.equal(403);
+        expect(body.message).to.be.equal('Permission denied');
+
+        // DB validation
+        const companyInDb = await CompanyService.getById(company.id);
+        expect(companyInDb.name).to.be.equal(company.name);
+      });
+      it('should throw error, company is not found', async () => {
         const { user, token } = await UserService.createOne(formUser({}));
 
         const { body, status } = await server.put(`/companies/${user.id}`).set({ 'auth-token': token }).send({ name: 'new name' });
@@ -213,7 +243,7 @@ describe('companyRoute', () => {
   });
   describe('/DELETE', () => {
     describe('/companies/:id', () => {
-      it('should successfully delete user', async () => {
+      it('should successfully delete company', async () => {
         const { user, token } = await UserService.createOne(formUser({}));
         const company = await CompanyService.createOne(formCompany({}) as any, user.id);
 
@@ -224,6 +254,34 @@ describe('companyRoute', () => {
         // DB validation
         const companies = await CompanyService.getAll();
         expect(companies.length).to.be.equal(0);
+      });
+      it('should successfully delete company (as admin)', async () => {
+        const { user } = await UserService.createOne(formUser({}));
+        const { token } = await UserService.createOne({
+          name: 'us', email: 'user@email.com', password: 'secure', isAdmin: true,
+        });
+        const company = await CompanyService.createOne(formCompany({}) as any, user.id);
+
+        const { body, status } = await server.delete(`/companies/${company.id}`).set({ 'auth-token': token });
+        // response validation
+        expect(status).to.be.equal(200);
+        expect(body).to.be.deep.equal(company);
+        // DB validation
+        const companies = await CompanyService.getAll();
+        expect(companies.length).to.be.equal(0);
+      });
+      it('should return error (not company admin)', async () => {
+        const { user } = await UserService.createOne(formUser({}));
+        const { token } = await UserService.createOne({ name: 'us', email: 'user@email.com', password: 'secure' });
+        const company = await CompanyService.createOne(formCompany({}) as any, user.id);
+
+        const { body, status } = await server.delete(`/companies/${company.id}`).set({ 'auth-token': token });
+        // response validation
+        expect(status).to.be.equal(403);
+        expect(body.message).to.be.equal('Permission denied');
+        // DB validation
+        const companies = await CompanyService.getAll();
+        expect(companies.length).to.be.equal(1);
       });
       it('should return error (company not found)', async () => {
         const { token } = await UserService.createOne(formUser({}));

@@ -13,6 +13,10 @@ import CompanyApi from '../databases/mongodb/api/CompanyApi';
 
 export default class CompanyService {
   /* CRUD */
+  public static async isExists(id: any): Promise<boolean> {
+    return CompanyApi.isExists(id);
+  }
+
   public static async getById(id: any): Promise<ICompany> {
     const company: ICompany = await CompanyApi.getById(id);
     if (!company) throw new NotFoundError(`Company with id "${id}" is not found!`);
@@ -57,13 +61,7 @@ export default class CompanyService {
   }
 
   public static async isUserCompanyAdmin(companyId: any, userId: any): Promise<boolean> {
-    try {
-      const company = await CompanyApi.isUserCompanyAdmin(companyId, userId);
-      return !!company;
-    } catch (error) {
-      if (error instanceof DBNotFoundError) throw new NotFoundError(error.message);
-      throw error;
-    }
+    return CompanyApi.isUserCompanyAdmin(companyId, userId);
   }
 
   // public static async inviteUser(companyId: any, userId: any): Promise<IInvite> {

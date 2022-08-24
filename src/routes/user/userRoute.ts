@@ -68,7 +68,7 @@ router.get(
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
     const [reqUserId, targetUserId, isAdmin] = [req.user.id, req.params.id, req.user.isAdmin];
-    Accessor.canUserGetUser(reqUserId, targetUserId, isAdmin);
+    await Accessor.canUserGetUser(reqUserId, targetUserId, isAdmin);
     const user: IUser = await UserService.getById(req.params.id);
     return SuccessResponse(res, 200, user);
   }),
@@ -92,8 +92,8 @@ router.delete(
   asyncHandler(async (req: Request, res: Response) => {
     const [reqUserId, targetUserId, isAdmin] = [req.user.id, req.params.id, req.user.isAdmin];
     await Accessor.canUserDeleteUser(reqUserId, targetUserId, isAdmin);
-    await UserService.deleteById(targetUserId);
-    return SuccessResponse(res, 200);
+    const deletedUser = await UserService.deleteById(targetUserId);
+    return SuccessResponse(res, 200, deletedUser);
   }),
 );
 /* CRUD */

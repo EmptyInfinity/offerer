@@ -205,6 +205,50 @@ describe('userRoute', () => {
           name: 'John',
         });
       });
+      it('should return error (as admin)', async () => {
+        const { user } = await UserService.createOne(formUser({}));
+        const { token } = await UserService.createOne({
+          name: 'us', email: 'user@email.com', password: 'secure', isAdmin: true,
+        });
+
+        const { body: resUser, status } = await server.put(`/users/${user.id}`).set({ 'auth-token': token }).send({ name: 'John' });
+
+        // response validation
+        expect(status).to.be.equal(200);
+        delete user.password;
+        expect(resUser).to.be.deep.equal({
+          id: resUser.id,
+          name: 'John',
+          isAdmin: false,
+          offers: [],
+          skills: [],
+        });
+
+        // DB validation
+        const userInDb = await UserService.getById(resUser.id);
+        expect({ ...userInDb, email: user.email }).to.be.deep.equal({
+          ...resUser,
+          email: user.email,
+          skills: [],
+          offers: [],
+          isAdmin: false,
+          name: 'John',
+        });
+      });
+      it('should return error (permission denied)', async () => {
+        const { user } = await UserService.createOne(formUser({}));
+        const { token } = await UserService.createOne({ name: 'us', email: 'user@email.com', password: 'secure' });
+
+        const { body, status } = await server.put(`/users/${user.id}`).set({ 'auth-token': token }).send({ name: 'John' });
+
+        // response validation
+        expect(status).to.be.equal(403);
+        expect(body.message).to.be.equal('Permission denied');
+
+        // DB validation
+        const userInDb = await UserService.getById(user.id);
+        expect(userInDb.name).to.be.equal(user.name);
+      });
       it('should return error (user not found)', async () => {
         const user = formUser({});
         const { user: createdUser, token } = await UserService.createOne(user);
@@ -384,6 +428,22 @@ describe('userRoute', () => {
         expect(status).to.be.equal(200);
         expect(body).to.be.deep.equal(user);
       });
+      it('should successfully get user (as admin)', async () => {
+        const { user } = await UserService.createOne(formUser({}));
+        const { token } = await UserService.createOne({
+          name: 'us', email: 'user@email.com', password: 'secure', isAdmin: true,
+        });
+        const { body, status } = await server.get(`/users/${user.id}`).set({ 'auth-token': token });
+        expect(status).to.be.equal(200);
+        expect(body).to.be.deep.equal(user);
+      });
+      it('should return error (permission denied)', async () => {
+        const { user } = await UserService.createOne(formUser({}));
+        const { token } = await UserService.createOne({ name: 'us', email: 'user@email.com', password: 'secure' });
+        const { body, status } = await server.get(`/users/${user.id}`).set({ 'auth-token': token });
+        expect(status).to.be.equal(403);
+        expect(body.message).to.be.equal('Permission denied');
+      });
       it('should return error (user not found)', async () => {
         const { token } = await UserService.createOne(formUser({}));
         const nonExistingId = '630473adaa90421c7c073d6e';
@@ -408,10 +468,30 @@ describe('userRoute', () => {
         const { body, status } = await server.delete(`/users/${user.id}`).set({ 'auth-token': token });
         // response validation
         expect(status).to.be.equal(200);
-        expect(body).to.be.deep.equal({});
+        expect(body).to.be.deep.equal(user);
         // DB validation
         const users = await UserService.getAll();
         expect(users.length).to.be.equal(0);
+      });
+      it('should successfully get user (as admin)', async () => {
+        const { user } = await UserService.createOne(formUser({}));
+        const { token } = await UserService.createOne({
+          name: 'us', email: 'user@email.com', password: 'secure', isAdmin: true,
+        });
+        const { body, status } = await server.delete(`/users/${user.id}`).set({ 'auth-token': token });
+        // response validation
+        expect(status).to.be.equal(200);
+        expect(body).to.be.deep.equal(user);
+        // DB validation
+        const users = await UserService.getAll();
+        expect(users.length).to.be.equal(1);
+      });
+      it('should return error (permission denied)', async () => {
+        const { user } = await UserService.createOne(formUser({}));
+        const { token } = await UserService.createOne({ name: 'us', email: 'user@email.com', password: 'secure' });
+        const { body, status } = await server.delete(`/users/${user.id}`).set({ 'auth-token': token });
+        expect(status).to.be.equal(403);
+        expect(body.message).to.be.equal('Permission denied');
       });
       it('should return error (user not found)', async () => {
         const { token } = await UserService.createOne(formUser({}));

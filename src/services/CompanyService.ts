@@ -4,15 +4,19 @@ import { dbDir } from '../config';
 import { ICompany, IInvite } from '../databases/interfaces';
 import { DBDuplicatedFieldError, DBNotFoundError } from '../databases/common';
 
-const dbPath = `../databases/${dbDir}`;
-const { default: CompanyApi } = require(`${dbPath}/api/CompanyApi`);
-const { default: InviteApi } = require(`${dbPath}/api/InviteApi`);
+import UserApi from '../databases/mongodb/api/UserApi';
+import OfferApi from '../databases/mongodb/api/OfferApi';
+import InviteApi from '../databases/mongodb/api/InviteApi';
+import CompanyApi from '../databases/mongodb/api/CompanyApi';
+// const dbPath = `../databases/${dbDir}`;
+// const { default: CompanyApi } = require(`${dbPath}/api/CompanyApi`);
+// const { default: InviteApi } = require(`${dbPath}/api/InviteApi`);
 
 export default class CompanyService {
   /* CRUD */
-  public static async getById(id: any): Promise<ICompany | null> {
-    const company: ICompany | undefined = await CompanyApi.getById(id);
-    if (!company) throw new NotFoundError(`Company "${id}" is not found!`);
+  public static async getById(id: any): Promise<ICompany> {
+    const company: ICompany = await CompanyApi.getById(id);
+    if (!company) throw new NotFoundError(`Company with id "${id}" is not found!`);
     return company;
   }
 
@@ -31,22 +35,21 @@ export default class CompanyService {
     }
   }
 
-  public static async updateById(id: any, companyData: ICompany): Promise<ICompany | null> {
+  public static async updateById(id: any, companyData: ICompany): Promise<ICompany> {
     try {
       const updatedCompany = await CompanyApi.updateById(id, companyData);
+      if (!updatedCompany) throw new NotFoundError(`Company with id "${id}" is not found!`);
       return updatedCompany;
     } catch (error) {
       if (error instanceof DBDuplicatedFieldError) throw new BadRequestError(error.message);
-      if (error instanceof DBNotFoundError) throw new NotFoundError(error.message);
       throw error;
     }
   }
 
   public static async deleteById(id: any): Promise<ICompany> {
-    if (!await CompanyApi.isExists(id)) {
-      throw new NotFoundError(`Company "${id}" is not found!`);
-    }
-    return CompanyApi.deleteById(id);
+    const deletedCompany = await CompanyApi.deleteById(id);
+    if (!deletedCompany) throw new NotFoundError(`Company with id "${id}" is not found!`);
+    return deletedCompany;
   }
   /* CRUD END */
 

@@ -1,7 +1,6 @@
 import { Types } from 'mongoose';
 import { UserModel } from '../models/User';
 import { IUser } from '../../interfaces';
-import { toJS } from '../index';
 
 export default class UserDbApi {
   /* CRUD */
@@ -10,7 +9,7 @@ export default class UserDbApi {
   }
 
   public static async getById(id: Types.ObjectId): Promise<IUser | null> {
-    return UserModel.findById(id).then((doc) => doc && doc.toObject());
+    return UserModel.findById(id, '+email').then((doc) => doc && doc.toObject());
   }
 
   public static async getAll(): Promise<IUser[]> {
@@ -25,7 +24,7 @@ export default class UserDbApi {
   }
 
   public static async deleteById(id: Types.ObjectId): Promise<IUser | null> {
-    return UserModel.findByIdAndDelete(id).exec();
+    return UserModel.findByIdAndDelete(id).then((doc) => doc && doc.toObject());
   }
 
   /* CRUD END */

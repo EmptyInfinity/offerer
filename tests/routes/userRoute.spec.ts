@@ -205,6 +205,38 @@ describe('userRoute', () => {
           name: 'John',
         });
       });
+      it('should return error (user not found)', async () => {
+        const user = formUser({});
+        const { user: createdUser, token } = await UserService.createOne(user);
+
+        const nonExistingId = '630473adaa90421c7c073d6e';
+        const { body, status } = await server.put(`/users/${nonExistingId}`).set({ 'auth-token': token }).send({ name: 'John' });
+
+        // response validation
+        expect(status).to.be.equal(404);
+        expect(body.message).to.be.equal(`User with id "${nonExistingId}" is not found!`);
+
+
+        // DB validation
+        const userInDb = await UserService.getById(createdUser.id);
+        expect(userInDb.name).to.be.equal(createdUser.name);
+      });
+      it('should return error (user not found), role: admin', async () => {
+        const user = formUser({});
+        const { user: createdUser, token } = await UserService.createOne({ ...user, isAdmin: true });
+
+        const nonExistingId = '630473adaa90421c7c073d6e';
+        const { body, status } = await server.put(`/users/${nonExistingId}`).set({ 'auth-token': token }).send({ name: 'John' });
+
+        // response validation
+        expect(status).to.be.equal(404);
+        expect(body.message).to.be.equal(`User with id "${nonExistingId}" is not found!`);
+
+
+        // DB validation
+        const userInDb = await UserService.getById(createdUser.id);
+        expect(userInDb.name).to.be.equal(createdUser.name);
+      });
       it('should return error (validation with @hapi/joi)', async () => {
         const user = formUser({});
         delete user.name;
@@ -346,16 +378,25 @@ describe('userRoute', () => {
   describe('/GET', () => {
     describe('/users/:id', () => {
       it('should successfully get user', async () => {
-        const { user, token } = await UserService.createOne(formUser({}));
+        const formedUser = formUser({});
+        const { user, token } = await UserService.createOne(formedUser);
         const { body, status } = await server.get(`/users/${user.id}`).set({ 'auth-token': token });
         expect(status).to.be.equal(200);
-        expect(body.id).to.be.equal(user.id);
+        expect(body).to.be.deep.equal(user);
       });
       it('should return error (user not found)', async () => {
         const { token } = await UserService.createOne(formUser({}));
-        const { body, status } = await server.get('/users/612bff4b0e6f92c162e3262b').set({ 'auth-token': token });
-        expect(status).to.be.equal(403);
-        expect(body.message).to.be.deep.equal('Permission denied');
+        const nonExistingId = '630473adaa90421c7c073d6e';
+        const { body, status } = await server.get(`/users/${nonExistingId}`).set({ 'auth-token': token });
+        expect(status).to.be.equal(404);
+        expect(body.message).to.be.equal(`User with id "${nonExistingId}" is not found!`);
+      });
+      it('should return error (user not found), role: admin', async () => {
+        const { token } = await UserService.createOne({ ...formUser({}), isAdmin: true });
+        const nonExistingId = '630473adaa90421c7c073d6e';
+        const { body, status } = await server.get(`/users/${nonExistingId}`).set({ 'auth-token': token });
+        expect(status).to.be.equal(404);
+        expect(body.message).to.be.equal(`User with id "${nonExistingId}" is not found!`);
       });
     });
   });
@@ -369,21 +410,24 @@ describe('userRoute', () => {
         expect(status).to.be.equal(200);
         expect(body).to.be.deep.equal({});
         // DB validation
-        let errMsg;
-        try {
-          await UserService.getById(user.id);
-        } catch (error) {
-          errMsg = error.message;
-        }
-        expect(errMsg).to.be.equal('User not found!');
+        const users = await UserService.getAll();
+        expect(users.length).to.be.equal(0);
       });
-      it('should return error (permission denied)', async () => {
+      it('should return error (user not found)', async () => {
         const { token } = await UserService.createOne(formUser({}));
-
-        const { body, status } = await server.delete('/users/612bff4b0e6f92c162e3262b').set({ 'auth-token': token });
+        const nonExistingId = '630473adaa90421c7c073d6e';
+        const { body, status } = await server.delete(`/users/${nonExistingId}`).set({ 'auth-token': token });
         // response validation
-        expect(status).to.be.equal(403);
-        expect(body.message).to.be.equal('Permission denied');
+        expect(status).to.be.equal(404);
+        expect(body.message).to.be.equal(`User with id "${nonExistingId}" is not found!`);
+      });
+      it('should return error (user not found), role: admin', async () => {
+        const { token } = await UserService.createOne({ ...formUser({}), isAdmin: true });
+        const nonExistingId = '630473adaa90421c7c073d6e';
+        const { body, status } = await server.delete(`/users/${nonExistingId}`).set({ 'auth-token': token });
+        // response validation
+        expect(status).to.be.equal(404);
+        expect(body.message).to.be.equal(`User with id "${nonExistingId}" is not found!`);
       });
     });
   });

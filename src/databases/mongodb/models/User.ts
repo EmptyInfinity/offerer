@@ -1,6 +1,7 @@
 import { model, Schema, Document } from 'mongoose';
 import { IUser } from '../../interfaces';
 import { DBDuplicatedFieldError } from '../../common';
+import { capitalize } from '../../../helpers';
 
 const { Types } = Schema;
 export const DOCUMENT_NAME = 'User';

@@ -5,21 +5,21 @@ import { dbDir } from '../config';
 import { IOffer, IUser } from '../databases/interfaces';
 import { createToken } from '../helpers';
 import CompanyService from './CompanyService';
-import { DBDuplicatedFieldError } from '../databases/common';
+import { DBDuplicatedFieldError, DBNotFoundError } from '../databases/common';
 
-// import UserApi from '../databases/mongodb/api/UserApi';
-// import OfferApi from '../databases/mongodb/api/OfferApi';
-// import InviteApi from '../databases/mongodb/api/InviteApi';
-const dbPath = `../databases/${dbDir}`;
-const { default: UserApi } = require(`${dbPath}/api/UserApi`);
-const { default: OfferApi } = require(`${dbPath}/api/OfferApi`);
-const { default: InviteApi } = require(`${dbPath}/api/InviteApi`);
+import UserApi from '../databases/mongodb/api/UserApi';
+import OfferApi from '../databases/mongodb/api/OfferApi';
+import InviteApi from '../databases/mongodb/api/InviteApi';
+// const dbPath = `../databases/${dbDir}`;
+// const { default: UserApi } = require(`${dbPath}/api/UserApi`);
+// const { default: OfferApi } = require(`${dbPath}/api/OfferApi`);
+// const { default: InviteApi } = require(`${dbPath}/api/InviteApi`);
 
 export default class UserService {
   /* CRUD */
-  public static async getById(id: any): Promise<IUser | null> {
-    const user: IUser | undefined = await UserApi.getById(id);
-    if (!user) throw new NotFoundError('User not found!');
+  public static async getById(id: any): Promise<IUser> {
+    const user: IUser = await UserApi.getById(id);
+    if (!user) throw new NotFoundError(`User with id "${id}" is not found!`);
     return user;
   }
 
@@ -35,23 +35,25 @@ export default class UserService {
       delete insertedUser.password;
       return { user: insertedUser, token };
     } catch (error) {
-      if (error instanceof DBDuplicatedFieldError) {
-        throw new BadRequestError(error.message);
-      }
+      if (error instanceof DBDuplicatedFieldError) throw new BadRequestError(error.message);
       throw error;
     }
   }
 
-  public static updateById(id: any, userData: IUser): Promise<IUser | null> {
-    return UserApi.updateById(id, userData);
+  public static async updateById(id: any, userData: IUser): Promise<IUser> {
+    const updatedUser = await UserApi.updateById(id, userData);
+    if (!updatedUser) throw new NotFoundError(`User with id "${id}" is not found!`);
+    return updatedUser;
   }
 
-  public static deleteById(id: any): Promise<IUser> {
-    return UserApi.deleteById(id);
+  public static async deleteById(id: any): Promise<IUser> {
+    const deletedUser = await UserApi.deleteById(id);
+    if (!deletedUser) throw new NotFoundError(`User with id "${id}" is not found!`);
+    return deletedUser;
   }
   /* CRUD END */
 
-  public static async getUserByEmailWithPassword(email: string): Promise<IUser | null> {
+  public static async getUserByEmailWithPassword(email: string): Promise<IUser> {
     return UserApi.getUserByEmailWithPassword(email);
   }
 

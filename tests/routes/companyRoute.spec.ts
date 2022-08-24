@@ -136,7 +136,7 @@ describe('companyRoute', () => {
         const companiesInDb = await CompanyService.getAll();
         expect(companiesInDb.length).to.be.equal(2);
       });
-      it.only('should throw error, duplicated link', async () => {
+      it('should throw error, duplicated link', async () => {
         const { user, token } = await UserService.createOne(formUser({}));
         const company = await CompanyService.createOne(formCompany({}) as any, user.id);
         const company2 = await CompanyService.createOne({ name: 'c2', link: 'https://ac.me' } as any, user.id);
@@ -183,6 +183,63 @@ describe('companyRoute', () => {
         // DB validation
         const companiesInDb = await CompanyService.getAll();
         expect(companiesInDb.length).to.be.equal(0);
+      });
+    });
+  });
+  describe('/GET', () => {
+    describe('/companies/:id', () => {
+      it('should successfully get company', async () => {
+        const { user, token } = await UserService.createOne(formUser({}));
+        const company = await CompanyService.createOne(formCompany({}) as any, user.id);
+        const { body, status } = await server.get(`/companies/${company.id}`).set({ 'auth-token': token });
+        expect(status).to.be.equal(200);
+        expect(body).to.be.deep.equal(company);
+      });
+      it('should return error (company not found)', async () => {
+        const { token } = await UserService.createOne(formUser({}));
+        const nonExistingId = '630473adaa90421c7c073d6e';
+        const { body, status } = await server.get(`/companies/${nonExistingId}`).set({ 'auth-token': token });
+        expect(status).to.be.equal(404);
+        expect(body.message).to.be.equal(`Company with id "${nonExistingId}" is not found!`);
+      });
+      it('should return error (company not found), role: admin', async () => {
+        const { token } = await UserService.createOne({ ...formUser({}), isAdmin: true });
+        const nonExistingId = '630473adaa90421c7c073d6e';
+        const { body, status } = await server.get(`/companies/${nonExistingId}`).set({ 'auth-token': token });
+        expect(status).to.be.equal(404);
+        expect(body.message).to.be.equal(`Company with id "${nonExistingId}" is not found!`);
+      });
+    });
+  });
+  describe('/DELETE', () => {
+    describe('/companies/:id', () => {
+      it('should successfully delete user', async () => {
+        const { user, token } = await UserService.createOne(formUser({}));
+        const company = await CompanyService.createOne(formCompany({}) as any, user.id);
+
+        const { body, status } = await server.delete(`/companies/${company.id}`).set({ 'auth-token': token });
+        // response validation
+        expect(status).to.be.equal(200);
+        expect(body).to.be.deep.equal(company);
+        // DB validation
+        const companies = await CompanyService.getAll();
+        expect(companies.length).to.be.equal(0);
+      });
+      it('should return error (company not found)', async () => {
+        const { token } = await UserService.createOne(formUser({}));
+        const nonExistingId = '630473adaa90421c7c073d6e';
+        const { body, status } = await server.delete(`/companies/${nonExistingId}`).set({ 'auth-token': token });
+        // response validation
+        expect(status).to.be.equal(404);
+        expect(body.message).to.be.equal(`Company with id "${nonExistingId}" is not found!`);
+      });
+      it('should return error (company not found), role: admin', async () => {
+        const { token } = await UserService.createOne({ ...formUser({}), isAdmin: true });
+        const nonExistingId = '630473adaa90421c7c073d6e';
+        const { body, status } = await server.delete(`/companies/${nonExistingId}`).set({ 'auth-token': token });
+        // response validation
+        expect(status).to.be.equal(404);
+        expect(body.message).to.be.equal(`Company with id "${nonExistingId}" is not found!`);
       });
     });
   });

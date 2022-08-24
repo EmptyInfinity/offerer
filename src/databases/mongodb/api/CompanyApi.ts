@@ -24,16 +24,11 @@ export default class CompanyDbApi {
   }
 
   public static async updateById(id: Types.ObjectId, companyData: ICompany): Promise<ICompany | null> {
-    return CompanyModel.findByIdAndUpdate(id, { $set: companyData }, { new: true }).then((doc) => {
-      if (doc) {
-        return doc.toObject();
-      }
-      throw new DBNotFoundError(`Company with id "${id}" is not found!`);
-    });
+    return CompanyModel.findByIdAndUpdate(id, { $set: companyData }, { new: true }).then((doc) => doc && doc.toObject());
   }
 
   public static async deleteById(id: Types.ObjectId): Promise<ICompany | null> {
-    return CompanyModel.findByIdAndDelete(id).exec();
+    return CompanyModel.findByIdAndDelete(id).then((doc) => doc && doc.toObject());
   }
   /* CRUD END */
 

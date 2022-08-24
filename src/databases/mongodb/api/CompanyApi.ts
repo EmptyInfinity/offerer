@@ -1,7 +1,6 @@
 import { Types } from 'mongoose';
 import { CompanyModel } from '../models/Company';
 import { ICompany } from '../../interfaces';
-import { DBNotFoundError } from '../../common';
 
 export default class CompanyDbApi {
   public static async isExists(_id: Types.ObjectId): Promise<any> {
@@ -13,7 +12,7 @@ export default class CompanyDbApi {
     return CompanyModel.create(companyData).then((doc) => doc && doc.toObject());
   }
 
-  public static async getById(id: Types.ObjectId): Promise<any> {
+  public static async getById(id: Types.ObjectId): Promise<ICompany | null> {
     return CompanyModel.findById(id).then((doc) => doc && doc.toObject());
   }
 

@@ -20,7 +20,7 @@ export default class UserService {
   }
 
   public static async getById(id: any): Promise<IUser> {
-    const user: IUser = await UserApi.getById(id);
+    const user = await UserApi.getById(id);
     if (!user) throw new NotFoundError(`User with id "${id}" is not found!`);
     return user;
   }

@@ -18,7 +18,7 @@ export default class CompanyService {
   }
 
   public static async getById(id: any): Promise<ICompany> {
-    const company: ICompany = await CompanyApi.getById(id);
+    const company = await CompanyApi.getById(id);
     if (!company) throw new NotFoundError(`Company with id "${id}" is not found!`);
     return company;
   }

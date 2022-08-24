@@ -9,25 +9,25 @@ const { default: OfferApi } = require(`${dbPath}/api/OfferApi`);
 export default class OfferService {
   /* CRUD */
   public static async getById(id: any): Promise<IOffer> {
-    const offer: IOffer | null = await OfferApi.getById(id);
-    if (!offer) throw new NotFoundError('Offer not found!');
+    const offer = await OfferApi.getById(id);
+    if (!offer) throw new NotFoundError(`Offer with id "${id}" is not found!`);
     return offer;
   }
 
-  public static getAll(): Promise<IOffer[]> {
-    return OfferApi.getAll();
+  public static createOne(offerData: IOffer, companyId: any): Promise<IOffer> {
+    return OfferApi.createOne({ ...offerData, company: companyId });
   }
 
-  public static createOne(offerData: IOffer): Promise<IOffer> {
-    return OfferApi.createOne(offerData);
+  public static async updateById(id: any, offerData: IOffer): Promise<IOffer> {
+    const updatedOffer = await OfferApi.updateById(id, offerData);
+    if (!updatedOffer) throw new NotFoundError(`Company with id "${id}" is not found!`);
+    return updatedOffer;
   }
 
-  public static updateById(id: any, offerData: IOffer): Promise<IOffer | null> {
-    return OfferApi.updateById(id, offerData);
-  }
-
-  public static deleteById(id: any): Promise<IOffer> {
-    return OfferApi.deleteById(id);
+  public static async deleteById(id: any): Promise<IOffer> {
+    const deletedOffer = await OfferApi.deleteById(id);
+    if (!deletedOffer) throw new NotFoundError(`Company with id "${id}" is not found!`);
+    return deletedOffer;
   }
   /* CRUD END */
 }

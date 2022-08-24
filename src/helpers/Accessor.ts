@@ -5,7 +5,7 @@ import UserService from '../services/UserService';
 export default class Accessor {
   private static isUserCompanyAdmin = async (companyId: any, userId: any) => CompanyService.isUserCompanyAdmin(companyId, userId);
 
-  private static isUserInCompany = async (companyId: any, userId: any) => CompanyService.isUserInCompany(companyId, userId);
+  // private static isUserInCompany = async (companyId: any, userId: any) => CompanyService.isUserInCompany(companyId, userId);
 
   // companies route
   public static canUserCreateCompany = (isAdmin: boolean) => {
@@ -18,10 +18,10 @@ export default class Accessor {
     }
   }
 
-  public static canUserJoinCompany = async (companyId: any, userId: any) => {
-    // look for existing invite
-    if (!await this.isUserInCompany(companyId, userId)) throw new ForbiddenError('User already belongs company!');
-  }
+  // public static canUserJoinCompany = async (companyId: any, userId: any) => {
+  //   // look for existing invite
+  //   if (!await this.isUserInCompany(companyId, userId)) throw new ForbiddenError('User already belongs company!');
+  // }
 
   public static canUserDeleteCompany = async (companyId: any, userId: any, isAdmin: boolean) => this.canUserUpdateCompany(companyId, userId, isAdmin);
 

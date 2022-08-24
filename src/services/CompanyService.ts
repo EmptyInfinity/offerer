@@ -1,7 +1,6 @@
 /* eslint-disable import/no-dynamic-require */
 import { NotFoundError, BadRequestError } from '../handlers/ApiError';
-import { dbDir } from '../config';
-import { ICompany, IInvite } from '../databases/interfaces';
+import { ICompany } from '../databases/interfaces';
 import { DBDuplicatedFieldError, DBNotFoundError } from '../databases/common';
 
 import UserApi from '../databases/mongodb/api/UserApi';
@@ -53,14 +52,14 @@ export default class CompanyService {
   }
   /* CRUD END */
 
-  public static async isUserInCompany(companyId: any, userId: any): Promise<boolean> {
-    return CompanyApi.isUserInCompany(companyId, userId);
-  }
+  // public static async isUserInCompany(companyId: any, userId: any): Promise<boolean> {
+  //   return CompanyApi.isUserInCompany(companyId, userId);
+  // }
 
   public static async isUserCompanyAdmin(companyId: any, userId: any): Promise<boolean> {
     try {
       const company = await CompanyApi.isUserCompanyAdmin(companyId, userId);
-      return company;
+      return !!company;
     } catch (error) {
       if (error instanceof DBNotFoundError) throw new NotFoundError(error.message);
       throw error;

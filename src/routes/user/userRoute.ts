@@ -98,36 +98,28 @@ router.delete(
 );
 /* CRUD */
 
-router.delete( // DEV-only
-  '/',
-  asyncHandler(async (req: Request, res: Response) => {
-    await UserService.deleteAll();
-    return SuccessResponse(res, 200);
-  }),
-);
+// router.post(
+//   '/join-company/:id',
+//   verifyToken,
+//   validator(null, ValidationSource.PARAM),
+//   asyncHandler(async (req: Request, res: Response) => {
+//     const [companyId, userId] = [req.user.id, req.params.id];
+//     await Accessor.canUserJoinCompany(companyId, userId);
+//     // await UserService.joinCompany(userId, companyId);
+//     return SuccessResponse(res, 200);
+//   }),
+// );
 
-router.post(
-  '/join-company/:id',
-  verifyToken,
-  validator(null, ValidationSource.PARAM),
-  asyncHandler(async (req: Request, res: Response) => {
-    const [companyId, userId] = [req.user.id, req.params.id];
-    await Accessor.canUserJoinCompany(companyId, userId);
-    // await UserService.joinCompany(userId, companyId);
-    return SuccessResponse(res, 200);
-  }),
-);
-
-router.post(
-  '/leave-company',
-  verifyToken,
-  validator(null, ValidationSource.PARAM),
-  asyncHandler(async (req: Request, res: Response) => {
-    console.log('leave');
-    // Accessor.canUserLeaveCompany(req);
-    // await UserService.leaveCompany(req.user);
-    return SuccessResponse(res, 200);
-  }),
-);
+// router.post(
+//   '/leave-company',
+//   verifyToken,
+//   validator(null, ValidationSource.PARAM),
+//   asyncHandler(async (req: Request, res: Response) => {
+//     console.log('leave');
+//     // Accessor.canUserLeaveCompany(req);
+//     // await UserService.leaveCompany(req.user);
+//     return SuccessResponse(res, 200);
+//   }),
+// );
 
 export default router;

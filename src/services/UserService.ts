@@ -1,11 +1,9 @@
 /* eslint-disable import/no-dynamic-require */
 import { genSalt, hash } from 'bcrypt';
-import { NotFoundError, ForbiddenError, BadRequestError } from '../handlers/ApiError';
-import { dbDir } from '../config';
+import { NotFoundError, BadRequestError } from '../handlers/ApiError';
 import { IOffer, IUser } from '../databases/interfaces';
 import { createToken } from '../helpers';
-import CompanyService from './CompanyService';
-import { DBDuplicatedFieldError, DBNotFoundError } from '../databases/common';
+import { DBDuplicatedFieldError } from '../databases/common';
 
 import UserApi from '../databases/mongodb/api/UserApi';
 import OfferApi from '../databases/mongodb/api/OfferApi';
@@ -57,9 +55,9 @@ export default class UserService {
     return UserApi.getUserByEmailWithPassword(email);
   }
 
-  public static deleteAll(): Promise<any> {
-    return UserApi.deleteAll();
-  }
+  // public static deleteAll(): Promise<any> {
+  //   return UserApi.deleteAll();
+  // }
 
   // public static async joinCompany(userId: any, companyId: any): Promise<IUser | null> {
   //   const invite = await InviteApi.getOne({ user: userId, company: companyId });
@@ -79,12 +77,12 @@ export default class UserService {
     return hash(password, salt);
   }
 
-  private static async saveUserOffers(offers: IOffer[]): Promise<any[]> {
-    const savedOffersIds: any[] = [];
-    await Promise.all(offers.map(async (offer: IOffer) => {
-      const { id } = await OfferApi.createOne(offer);
-      savedOffersIds.push(id);
-    }));
-    return savedOffersIds;
-  }
+  // private static async saveUserOffers(offers: IOffer[]): Promise<any[]> {
+  //   const savedOffersIds: any[] = [];
+  //   await Promise.all(offers.map(async (offer: IOffer) => {
+  //     const { id } = await OfferApi.createOne(offer);
+  //     savedOffersIds.push(id);
+  //   }));
+  //   return savedOffersIds;
+  // }
 }

@@ -32,9 +32,9 @@ export default class CompanyDbApi {
   }
   /* CRUD END */
 
-  public static async isUserInCompany(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
-    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId }).lean());
-  }
+  // public static async isUserInCompany(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
+  //   return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId }).lean());
+  // }
 
   public static async isUserCompanyAdmin(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
     return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId, 'employees.isAdmin': true }).then((doc) => {

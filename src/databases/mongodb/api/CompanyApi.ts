@@ -18,8 +18,6 @@ export default class CompanyDbApi {
   }
 
   public static async getAll(): Promise<ICompany[]> {
-    // const companies: ICompany[] = await CompanyModel.find().lean();
-    // return companies.map((company: ICompany) => normalized(company));
     return CompanyModel.find().lean();
   }
 
@@ -32,17 +30,12 @@ export default class CompanyDbApi {
   }
   /* CRUD END */
 
-  // public static async isUserInCompany(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
-  //   return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId }).lean());
-  // }
+  public static async isUserInCompany(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
+    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId }).then((doc) => doc && doc.toObject()));
+  }
 
   public static async isUserCompanyAdmin(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
-    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId, 'employees.isAdmin': true }).then((doc) => {
-      if (doc) {
-        return doc.toObject();
-      }
-      throw new DBNotFoundError(`Company with id "${companyId}" is not found!`);
-    }));
+    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId, 'employees.isAdmin': true }).then((doc) => doc && doc.toObject()));
   }
 
   // public static async addUser(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<ICompany | null> {

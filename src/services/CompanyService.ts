@@ -52,9 +52,9 @@ export default class CompanyService {
   }
   /* CRUD END */
 
-  // public static async isUserInCompany(companyId: any, userId: any): Promise<boolean> {
-  //   return CompanyApi.isUserInCompany(companyId, userId);
-  // }
+  public static async isUserInCompany(companyId: any, userId: any): Promise<boolean> {
+    return CompanyApi.isUserInCompany(companyId, userId);
+  }
 
   public static async isUserCompanyAdmin(companyId: any, userId: any): Promise<boolean> {
     try {

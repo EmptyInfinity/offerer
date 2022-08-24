@@ -13,9 +13,6 @@ export default class UserDbApi {
   }
 
   public static async getAll(): Promise<IUser[]> {
-    // const users: IUser[] = await UserModel.find().lean<IUser>()
-    //   .populate('offers', '-_id -description');
-    // return users.map((user: IUser) => normalized(user));
     return UserModel.find().lean();
   }
 

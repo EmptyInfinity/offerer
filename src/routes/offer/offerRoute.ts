@@ -9,7 +9,7 @@ import asyncHandler from '../../helpers/asyncHandler';
 import { ICompany } from '../../databases/interfaces';
 import verifyToken from '../../helpers/verifyToken';
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 /* CRUD */
 router.post(
@@ -17,8 +17,8 @@ router.post(
   verifyToken,
   validator(schema.post, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    const [companyId, userId] = [req.params.id, req.user.id];
-    await Accessor.canUserCreateOffer(companyId, userId);
+    const [userId, companyId] = [req.user.id, req.params.companyId];
+    await Accessor.canUserCreateOffer(userId, companyId);
     const offer = await OfferService.createOne(req.body, companyId);
     return SuccessResponse(res, 200, offer);
   }),

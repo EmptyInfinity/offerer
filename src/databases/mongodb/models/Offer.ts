@@ -47,6 +47,7 @@ if (!schema.options.toObject) schema.options.toObject = {};
 // @ts-ignore
 schema.options.toObject.transform = function (doc, obj, options) {
   obj.id = obj._id.toString();
+  obj.company = obj.company.toString();
   delete obj._id;
   return obj;
 };

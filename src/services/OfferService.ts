@@ -2,9 +2,10 @@
 import { NotFoundError } from '../handlers/ApiError';
 import { dbDir } from '../config';
 import { IOffer } from '../databases/interfaces';
+import OfferApi from '../databases/mongodb/api/OfferApi';
 
 const dbPath = `../databases/${dbDir}`;
-const { default: OfferApi } = require(`${dbPath}/api/OfferApi`);
+// const { default: OfferApi } = require(`${dbPath}/api/OfferApi`);
 
 export default class OfferService {
   /* CRUD */

@@ -5,6 +5,10 @@ import Logger from '../handlers/Logger';
 import { isDir, wordToPlural } from '../helpers';
 import loginHandler from './loginHandler';
 
+const routePrefixes: any = {
+  offers: '/companies/:companyId',
+};
+
 const router = express.Router();
 
 export default async () => {
@@ -13,7 +17,8 @@ export default async () => {
     const filesAndDirs = await fs.readdirSync(path.join(__dirname, '../routes'));
     filesAndDirs.forEach(async (item) => {
       if (!isDir(item)) return;
-      const route = `/${wordToPlural(item)}`;
+      const pluralName = wordToPlural(item);
+      const route = `${routePrefixes[pluralName] || ''}/${pluralName}`;
       const { default: routeHandler } = await import(`./${item}/${item}Route`);
       router.use(route, routeHandler);
     });

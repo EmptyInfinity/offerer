@@ -9,7 +9,7 @@
     "lint": "eslint '*/**/*.ts' --quiet --fix",
     "test": "npm run lint && mocha -r ts-node/register --require './tests/setupTests.ts' --require ts-node/register 'tests/**/*spec.ts' --timeout 20000 --coverage"
   },
-  "author": "",
+  "author": "Illia Soroka",
   "license": "ISC",
   "dependencies": {
     "@hapi/joi": "17.1.1",

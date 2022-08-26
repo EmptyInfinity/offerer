@@ -8,11 +8,19 @@ const dbPath = `../databases/${dbDir}`;
 // const { default: OfferApi } = require(`${dbPath}/api/OfferApi`);
 
 export default class OfferService {
+  public static async isExists(id: any): Promise<boolean> {
+    return OfferApi.isExists(id);
+  }
+
   /* CRUD */
   public static async getById(id: any): Promise<IOffer> {
     const offer = await OfferApi.getById(id);
     if (!offer) throw new NotFoundError(`Offer with id "${id}" is not found!`);
     return offer;
+  }
+
+  public static async getAll(): Promise<IOffer[]> {
+    return OfferApi.getAll();
   }
 
   public static createOne(offerData: IOffer, companyId: any): Promise<IOffer> {

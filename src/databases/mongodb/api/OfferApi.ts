@@ -3,6 +3,10 @@ import { OfferModel } from '../models/Offer';
 import { IOffer } from '../../interfaces';
 
 export default class OfferDbApi {
+  public static async isExists(_id: Types.ObjectId): Promise<any> {
+    return OfferModel.exists({ _id });
+  }
+
   /* CRUD */
   public static async createOne(offerData: IOffer): Promise<IOffer> {
     return OfferModel.create(offerData).then((doc) => doc && doc.toObject());
@@ -17,7 +21,7 @@ export default class OfferDbApi {
   }
 
   public static async updateById(id: Types.ObjectId, offerData: IOffer): Promise<IOffer | null> {
-    return OfferModel.findByIdAndUpdate(id, { $set: offerData }).then((doc) => doc && doc.toObject());
+    return OfferModel.findByIdAndUpdate(id, { $set: offerData }, { new: true }).then((doc) => doc && doc.toObject());
   }
 
   public static async deleteById(id: Types.ObjectId): Promise<IOffer | null> {

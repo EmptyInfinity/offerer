@@ -75,10 +75,14 @@ export default class Accessor {
   public static canUserUpdateOffer = async (userId: any, companyId: any, isAdmin: boolean) => {
     if (!isAdmin) {
       const isCompanyAdmin = await CompanyService.isUserCompanyAdmin(companyId, userId);
+      console.log(33, isCompanyAdmin);
+      console.log(32, !!await CompanyService.isExists(companyId));
       if (!isCompanyAdmin) {
         if (await CompanyService.isExists(companyId)) {
           throw new ForbiddenError();
         }
+        console.log(404);
+
         throw new NotFoundError(`Company with id "${companyId}" is not found!`);
       }
     }

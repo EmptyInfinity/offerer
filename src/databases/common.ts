@@ -7,8 +7,8 @@ export class DBDuplicatedFieldError extends Error {
 }
 
 export class DBNotFoundError extends Error {
-  constructor(message: string) {
-    super(message);
+  constructor(message?: string) {
+    super(message = 'Not Found');
     this.name = 'notFoundError';
   }
 }

@@ -17,7 +17,7 @@ router.post(
   verifyToken,
   validator(schema.post, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    const [userId, companyId] = [req.user.id, req.params.companyId];
+    const [userId, companyId, offerId] = [req.user.id, req.params.companyId, req.params.id];
     await Accessor.canUserCreateOffer(userId, companyId);
     const offer = await OfferService.createOne(req.body, companyId);
     return SuccessResponse(res, 200, offer);
@@ -39,9 +39,9 @@ router.put(
   validator(null, ValidationSource.PARAM),
   validator(schema.put, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    const [userId, companyId, isAdmin] = [req.user.id, req.params.id, req.user.isAdmin];
+    const [userId, companyId, offerId, isAdmin] = [req.user.id, req.params.companyId, req.params.id, req.user.isAdmin];
     await Accessor.canUserUpdateOffer(userId, companyId, isAdmin);
-    const updatedOffer = await OfferService.updateById(companyId, req.body);
+    const updatedOffer = await OfferService.updateById(offerId, req.body);
     return SuccessResponse(res, 200, updatedOffer);
   }),
 );
@@ -51,9 +51,9 @@ router.delete(
   verifyToken,
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
-    const [userId, companyId, isAdmin] = [req.user.id, req.params.id, req.user.isAdmin];
+    const [userId, companyId, offerId, isAdmin] = [req.user.id, req.params.companyId, req.params.id, req.user.isAdmin];
     await Accessor.canUserDeleteOffer(userId, companyId, isAdmin);
-    const deletedOffer = await OfferService.deleteById(companyId);
+    const deletedOffer = await OfferService.deleteById(offerId);
     return SuccessResponse(res, 200, deletedOffer);
   }),
 );

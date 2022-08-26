@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import { CompanyModel } from '../models/Company';
 import { ICompany } from '../../interfaces';
+import { DBNotFoundError } from '../../common';
 
 export default class CompanyDbApi {
   public static async isExists(_id: Types.ObjectId): Promise<any> {
@@ -30,11 +31,11 @@ export default class CompanyDbApi {
   /* CRUD END */
 
   public static async isUserInCompany(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
-    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId }).then((doc) => doc && doc.toObject()));
+    return !!(await CompanyModel.findOne({ _id: companyId, 'employees.user': userId }).then((doc) => doc && doc.toObject()));
   }
 
   public static async isUserCompanyAdmin(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
-    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId, 'employees.isAdmin': true }).then((doc) => doc && doc.toObject()));
+    return !!(await CompanyModel.findOne({ _id: companyId, 'employees.user': userId, 'employees.isAdmin': true }).then((doc) => doc && doc.toObject()));
   }
 
   // public static async addUser(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<ICompany | null> {

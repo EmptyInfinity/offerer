@@ -28,7 +28,8 @@ router.get(
   '/:id',
   validator(null, ValidationSource.PARAM),
   asyncHandler(async (req: Request, res: Response) => {
-    const offer = await OfferService.getById(req.params.id);
+    const [offerId, companyId] = [req.params.id, req.params.companyId];
+    const offer = await OfferService.getByIdInCompany(offerId, companyId);
     return SuccessResponse(res, 200, offer);
   }),
 );
@@ -41,7 +42,7 @@ router.put(
   asyncHandler(async (req: Request, res: Response) => {
     const [userId, companyId, offerId, isAdmin] = [req.user.id, req.params.companyId, req.params.id, req.user.isAdmin];
     await Accessor.canUserUpdateOffer(userId, companyId, isAdmin);
-    const updatedOffer = await OfferService.updateById(offerId, req.body);
+    const updatedOffer = await OfferService.updateByIdInCompany(offerId, req.body, companyId);
     return SuccessResponse(res, 200, updatedOffer);
   }),
 );
@@ -53,7 +54,7 @@ router.delete(
   asyncHandler(async (req: Request, res: Response) => {
     const [userId, companyId, offerId, isAdmin] = [req.user.id, req.params.companyId, req.params.id, req.user.isAdmin];
     await Accessor.canUserDeleteOffer(userId, companyId, isAdmin);
-    const deletedOffer = await OfferService.deleteById(offerId);
+    const deletedOffer = await OfferService.deleteByIdInCompany(offerId, companyId);
     return SuccessResponse(res, 200, deletedOffer);
   }),
 );

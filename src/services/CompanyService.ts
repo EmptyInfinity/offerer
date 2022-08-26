@@ -52,6 +52,7 @@ export default class CompanyService {
   public static async deleteById(id: any): Promise<ICompany> {
     const deletedCompany = await CompanyApi.deleteById(id);
     if (!deletedCompany) throw new NotFoundError(`Company with id "${id}" is not found!`);
+    await OfferApi.deleteAllByCompanyId(id);
     return deletedCompany;
   }
   /* CRUD END */

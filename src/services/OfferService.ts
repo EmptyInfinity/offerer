@@ -13,10 +13,13 @@ export default class OfferService {
   }
 
   /* CRUD */
-  public static async getById(id: any): Promise<IOffer> {
-    const offer = await OfferApi.getById(id);
-    if (!offer) throw new NotFoundError(`Offer with id "${id}" is not found!`);
-    return offer;
+  public static async getByIdInCompany(id: any, companyId: any): Promise<IOffer> {
+    const offerInCompany = await OfferApi.getByIdInCompany(id, companyId);
+    if (!offerInCompany) {
+      if (!await OfferService.isExists(id)) throw new NotFoundError(`Offer with id "${id}" is not found!`);
+      throw new NotFoundError(`Company with id "${companyId}" is not found!`);
+    }
+    return offerInCompany;
   }
 
   public static async getAll(): Promise<IOffer[]> {
@@ -27,15 +30,21 @@ export default class OfferService {
     return OfferApi.createOne({ ...offerData, company: companyId });
   }
 
-  public static async updateById(id: any, offerData: IOffer): Promise<IOffer> {
-    const updatedOffer = await OfferApi.updateById(id, offerData);
-    if (!updatedOffer) throw new NotFoundError(`Company with id "${id}" is not found!`);
+  public static async updateByIdInCompany(id: any, offerData: IOffer, companyId: any): Promise<IOffer> {
+    const updatedOffer = await OfferApi.updateByIdInCompany(id, offerData, companyId);
+    if (!updatedOffer) {
+      if (!await OfferService.isExists(id)) throw new NotFoundError(`Offer with id "${id}" is not found!`);
+      throw new NotFoundError(`Company with id "${companyId}" is not found!`);
+    }
     return updatedOffer;
   }
 
-  public static async deleteById(id: any): Promise<IOffer> {
-    const deletedOffer = await OfferApi.deleteById(id);
-    if (!deletedOffer) throw new NotFoundError(`Company with id "${id}" is not found!`);
+  public static async deleteByIdInCompany(id: any, companyId: any): Promise<IOffer> {
+    const deletedOffer = await OfferApi.deleteByIdInCompany(id, companyId);
+    if (!deletedOffer) {
+      if (!await OfferService.isExists(id)) throw new NotFoundError(`Offer with id "${id}" is not found!`);
+      throw new NotFoundError(`Company with id "${companyId}" is not found!`);
+    }
     return deletedOffer;
   }
   /* CRUD END */

@@ -2,7 +2,8 @@ import { expect } from 'chai';
 import request from 'supertest';
 import CompanyService from '../../src/services/CompanyService';
 import UserService from '../../src/services/UserService';
-import { formCompany, formUser } from '../helper';
+import OfferService from '../../src/services/OfferService';
+import { formCompany, formOffer, formUser } from '../helper';
 import getApp from '../../src/app';
 
 describe('companyRoute', () => {
@@ -246,6 +247,8 @@ describe('companyRoute', () => {
       it('should successfully delete company', async () => {
         const { user, token } = await UserService.createOne(formUser({}));
         const company = await CompanyService.createOne(formCompany({}) as any, user.id);
+        await OfferService.createOne(formOffer({}) as any, company.id);
+        await OfferService.createOne(formOffer({}) as any, company.id);
 
         const { body, status } = await server.delete(`/companies/${company.id}`).set({ 'auth-token': token });
         // response validation
@@ -254,6 +257,8 @@ describe('companyRoute', () => {
         // DB validation
         const companies = await CompanyService.getAll();
         expect(companies.length).to.be.equal(0);
+        const offers = await OfferService.getAll();
+        expect(offers.length).to.be.equal(0);
       });
       it('should successfully delete company (as admin)', async () => {
         const { user } = await UserService.createOne(formUser({}));

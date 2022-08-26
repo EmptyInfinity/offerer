@@ -17,3 +17,13 @@ export const formCompany = ({
   name,
   link,
 });
+
+export const formOffer = ({
+  name = 'Node.js Developer',
+  salary = 3000,
+  description = 'Big company with some requirements',
+}) => ({
+  name,
+  salary,
+  description,
+});

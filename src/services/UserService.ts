@@ -14,13 +14,13 @@ import InviteApi from '../databases/mongodb/api/InviteApi';
 // const { default: InviteApi } = require(`${dbPath}/api/InviteApi`);
 
 export default class UserService {
-  /* CRUD */
   public static async isExists(id: any): Promise<boolean> {
     return UserApi.isExists(id);
   }
 
+  /* CRUD */
   public static async getById(id: any): Promise<IUser> {
-    const user: IUser = await UserApi.getById(id);
+    const user = await UserApi.getById(id);
     if (!user) throw new NotFoundError(`User with id "${id}" is not found!`);
     return user;
   }

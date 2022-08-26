@@ -66,16 +66,16 @@ router.delete(
 );
 /* CRUD END */
 
-router.post(
-  '/invite/:userId',
-  verifyToken,
-  validator(null, ValidationSource.PARAM),
-  asyncHandler(async (req: Request, res: Response) => {
-    const [companyId, userId] = [req.params.id, req.user.id];
-    Accessor.canUserInviteToCompany(companyId, userId);
-    // await CompanyService.inviteUser(req.params.userId, req.user.company);
-    return SuccessResponse(res, 200);
-  }),
-);
+// router.post(
+//   '/invite/:userId',
+//   verifyToken,
+//   validator(null, ValidationSource.PARAM),
+//   asyncHandler(async (req: Request, res: Response) => {
+//     const [companyId, userId] = [req.params.id, req.user.id];
+//     Accessor.canUserInviteToCompany(companyId, userId);
+//     // await CompanyService.inviteUser(req.params.userId, req.user.company);
+//     return SuccessResponse(res, 200);
+//   }),
+// );
 
 export default router;

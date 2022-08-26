@@ -12,13 +12,13 @@ import CompanyApi from '../databases/mongodb/api/CompanyApi';
 // const { default: InviteApi } = require(`${dbPath}/api/InviteApi`);
 
 export default class CompanyService {
-  /* CRUD */
   public static async isExists(id: any): Promise<boolean> {
     return CompanyApi.isExists(id);
   }
 
+  /* CRUD */
   public static async getById(id: any): Promise<ICompany> {
-    const company: ICompany = await CompanyApi.getById(id);
+    const company = await CompanyApi.getById(id);
     if (!company) throw new NotFoundError(`Company with id "${id}" is not found!`);
     return company;
   }
@@ -52,6 +52,7 @@ export default class CompanyService {
   public static async deleteById(id: any): Promise<ICompany> {
     const deletedCompany = await CompanyApi.deleteById(id);
     if (!deletedCompany) throw new NotFoundError(`Company with id "${id}" is not found!`);
+    await OfferApi.deleteAllByCompanyId(id);
     return deletedCompany;
   }
   /* CRUD END */

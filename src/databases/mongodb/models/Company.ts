@@ -65,13 +65,13 @@ schema.post('save', (error: any, company: any, next: any) => {
 // @ts-ignore
 if (!schema.options.toObject) schema.options.toObject = {};
 // @ts-ignore
-schema.options.toObject.transform = function (doc, ret, options) {
-  ret.id = ret._id.toString();
-  ret.employees.forEach((empl: any) => {
+schema.options.toObject.transform = function (doc, obj, options) {
+  obj.id = obj._id.toString();
+  obj.employees.forEach((empl: any) => {
     empl.user = `${empl.user}`;
   });
-  delete ret._id;
-  return ret;
+  delete obj._id;
+  return obj;
 };
 
 export const CompanyModel = model<CompanyDocument>(DOCUMENT_NAME, schema, COLLECTION_NAME);

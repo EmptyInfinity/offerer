@@ -64,10 +64,10 @@ schema.post('save', (error: any, { email }: UserDocument, next: any) => {
 // @ts-ignore
 if (!schema.options.toObject) schema.options.toObject = {};
 // @ts-ignore
-schema.options.toObject.transform = function (doc, ret, options) {
-  ret.id = ret._id.toString();
-  delete ret._id;
-  return ret;
+schema.options.toObject.transform = function (doc, obj, options) {
+  obj.id = obj._id.toString();
+  delete obj._id;
+  return obj;
 };
 
 export const UserModel = model<UserDocument>(DOCUMENT_NAME, schema, COLLECTION_NAME);

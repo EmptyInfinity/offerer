@@ -17,7 +17,7 @@ const schema = new Schema(
       required: true,
       trim: true,
       minlength: 5,
-      maxlength: 100,
+      maxlength: 200,
     },
     salary: {
       type: Types.Number,
@@ -29,7 +29,7 @@ const schema = new Schema(
       type: Types.String,
       trim: true,
       minlength: 10,
-      maxlength: 200,
+      maxlength: 500,
     },
     company: {
       type: Schema.Types.ObjectId,
@@ -41,9 +41,15 @@ const schema = new Schema(
     versionKey: false,
   },
 );
-schema.set('toJSON', {
-  virtuals: true,
-  transform(doc, ret) { delete ret._id; },
-});
+
+// @ts-ignore
+if (!schema.options.toObject) schema.options.toObject = {};
+// @ts-ignore
+schema.options.toObject.transform = function (doc, obj, options) {
+  obj.id = obj._id.toString();
+  obj.company = obj.company.toString();
+  delete obj._id;
+  return obj;
+};
 
 export const OfferModel = model<OfferDocument>(DOCUMENT_NAME, schema, COLLECTION_NAME);

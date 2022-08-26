@@ -60,4 +60,29 @@ export default class Accessor {
   public static canUserUpdateUser = async (reqUserId: any, targetUserId: any, isAdmin: boolean) => this.canUserGetUser(reqUserId, targetUserId, isAdmin);
 
   public static canUserDeleteUser = async (reqUserId: any, targetUserId: any, isAdmin: boolean) => this.canUserGetUser(reqUserId, targetUserId, isAdmin);
+
+  // offers route
+  public static canUserCreateOffer = async (userId: any, companyId: any) => {
+    const isCompanyAdmin = await CompanyService.isUserCompanyAdmin(companyId, userId);
+    if (!isCompanyAdmin) {
+      if (await CompanyService.isExists(companyId)) {
+        throw new ForbiddenError();
+      }
+      throw new NotFoundError(`Company with id "${companyId}" is not found!`);
+    }
+  }
+
+  public static canUserUpdateOffer = async (userId: any, companyId: any, isAdmin: boolean) => {
+    if (!isAdmin) {
+      const isCompanyAdmin = await CompanyService.isUserCompanyAdmin(companyId, userId);
+      if (!isCompanyAdmin) {
+        if (await CompanyService.isExists(companyId)) {
+          throw new ForbiddenError();
+        }
+        throw new NotFoundError(`Company with id "${companyId}" is not found!`);
+      }
+    }
+  }
+
+  public static canUserDeleteOffer = async (userId: any, companyId: any, isAdmin: boolean) => this.canUserUpdateOffer(userId, companyId, isAdmin);
 }

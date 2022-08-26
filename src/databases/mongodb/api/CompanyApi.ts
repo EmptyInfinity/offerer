@@ -13,7 +13,7 @@ export default class CompanyDbApi {
     return CompanyModel.create(companyData).then((doc) => doc && doc.toObject());
   }
 
-  public static async getById(id: Types.ObjectId): Promise<any> {
+  public static async getById(id: Types.ObjectId): Promise<ICompany | null> {
     return CompanyModel.findById(id).then((doc) => doc && doc.toObject());
   }
 
@@ -31,11 +31,11 @@ export default class CompanyDbApi {
   /* CRUD END */
 
   public static async isUserInCompany(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
-    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId }).then((doc) => doc && doc.toObject()));
+    return !!(await CompanyModel.findOne({ _id: companyId, 'employees.user': userId }).then((doc) => doc && doc.toObject()));
   }
 
   public static async isUserCompanyAdmin(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
-    return !!(await CompanyModel.findOne({ id: companyId, 'employees.user': userId, 'employees.isAdmin': true }).then((doc) => doc && doc.toObject()));
+    return !!(await CompanyModel.findOne({ _id: companyId, 'employees.user': userId, 'employees.isAdmin': true }).then((doc) => doc && doc.toObject()));
   }
 
   // public static async addUser(companyId: Types.ObjectId, userId: Types.ObjectId): Promise<ICompany | null> {

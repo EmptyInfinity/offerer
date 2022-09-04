@@ -27,3 +27,5 @@ export const formOffer = ({
   salary,
   description,
 });
+
+export const formInvite = () => ({});

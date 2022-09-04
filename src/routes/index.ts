@@ -7,6 +7,7 @@ import loginHandler from './loginHandler';
 
 const routePrefixes: any = {
   offers: '/companies/:companyId',
+  invites: '/companies/:companyId',
 };
 
 const router = express.Router();

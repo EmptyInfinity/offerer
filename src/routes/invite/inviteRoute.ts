@@ -3,8 +3,9 @@ import Accessor from '../../helpers/Accessor';
 import { SuccessResponse } from '../../handlers/ApiResponse';
 import CompanyService from '../../services/CompanyService';
 import OfferService from '../../services/OfferService';
+import InviteService from '../../services/InviteService';
 import validator, { ValidationSource } from '../../helpers/validator';
-import schema from './offerSchema';
+import schema from './inviteSchema';
 import asyncHandler from '../../helpers/asyncHandler';
 import { ICompany } from '../../databases/interfaces';
 import verifyToken from '../../helpers/verifyToken';
@@ -15,12 +16,13 @@ const router = express.Router({ mergeParams: true });
 router.post(
   '/',
   verifyToken,
-  validator(schema.post, ValidationSource.BODY),
+  // validator(schema.post, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    const [userId, companyId] = [req.user.id, req.params.companyId];
-    await Accessor.canUserCreateOffer(userId, companyId);
-    const offer = await OfferService.createOne(req.body, companyId);
-    return SuccessResponse(res, 200, offer);
+    console.log(1, req.params, req.body, req.url);
+    // const [userId, companyId] = [req.user.id, req.params.companyId];
+    // await Accessor.canUserCreateOffer(userId, companyId);
+    // const offer = await OfferService.createOne(req.body, companyId);
+    return SuccessResponse(res, 200, {});
   }),
 );
 

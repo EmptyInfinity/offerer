@@ -73,24 +73,6 @@ export default class Accessor {
   public static canUserDeleteOffer = async (userId: any, companyId: any, isAdmin: boolean) => this.canUserUpdateOffer(userId, companyId, isAdmin);
 
   // invites route
-  // public static canUserInviteUserToCompany = async (companyId: any, reqUserId: any, targetUserId: any) => {
-  //   const isCompanyAdmin = await CompanyService.isUserCompanyAdmin(companyId, reqUserId);
-  //   if (!isCompanyAdmin) {
-  //     if (await CompanyService.isExists(companyId)) {
-  //       throw new ForbiddenError();
-  //     }
-  //     throw new NotFoundError(`Company with id "${companyId}" is not found!`);
-  //   }
-  //   if (!await UserService.isExists(targetUserId)) {
-  //     throw new NotFoundError(`User with id "${targetUserId}" is not found!`);
-  //   }
-  // }
-
-  // public static canUserJoinCompanyByOffer = async (companyId: any, userId: any, offerId: any) => {
-  //   if (await CompanyService.isUserInCompany(companyId, userId)) throw new ForbiddenError('User already belongs company!');
-  //   if (!await OfferService.isExists(offerId)) throw new NotFoundError(`Offer with id "${offerId}" is not found!`);
-  // }
-
   public static canUserInviteUserToCompanyByOffer = async (reqUserId: any, targetUserId: any, companyId: any, offerId: any) => {
     const isCompanyAdmin = await CompanyService.isUserCompanyAdmin(companyId, reqUserId);
     if (!isCompanyAdmin) {
@@ -102,6 +84,7 @@ export default class Accessor {
     if (!await UserService.isExists(targetUserId)) {
       throw new NotFoundError(`User with id "${targetUserId}" is not found!`);
     }
+    if (await CompanyService.isUserInCompany(companyId, targetUserId)) throw new ForbiddenError('User already belongs company!');
     if (!await OfferService.isExists(offerId)) {
       throw new NotFoundError(`Offer with id "${offerId}" is not found!`);
     }

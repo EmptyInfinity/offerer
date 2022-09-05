@@ -21,15 +21,11 @@ router.post(
   validator(schema.post, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
     const [reqUserId, companyId, targetUserId] = [req.user.id, req.params.companyId, req.body.user];
-    const { inviter, offerId } = req.body;
-    // if (inviter === 'company') {
-    //   await Accessor.canUserInviteUserToCompany(companyId, reqUserId, targetUserId);
-    // } else if (!await CompanyService.isExists(companyId)) throw new NotFoundError(`Company with id "${companyId}" is not found!`);
-    // await Accessor.canUserJoinCompanyByOffer(targetUserId, companyId, offerId);
+    const { inviter, offer } = req.body;
     if (inviter === 'company') {
-      await Accessor.canUserInviteUserToCompanyByOffer(reqUserId, targetUserId, companyId, offerId);
+      await Accessor.canUserInviteUserToCompanyByOffer(reqUserId, targetUserId, companyId, offer);
     } else {
-      await Accessor.canUserJoinCompanyByOffer(targetUserId, companyId, offerId);
+      await Accessor.canUserJoinCompanyByOffer(targetUserId, companyId, offer);
     }
     const invite = await InviteService.createOne(req.body, companyId);
     return SuccessResponse(res, 200, invite);

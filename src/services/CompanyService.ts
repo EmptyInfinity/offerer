@@ -65,6 +65,10 @@ export default class CompanyService {
     return CompanyApi.isUserCompanyAdmin(companyId, userId);
   }
 
+  public static async addUserToCompany(companyId: any, userId: any, isAdmin: boolean = false) {
+    return CompanyApi.addUserToCompany(companyId, userId, isAdmin);
+  }
+
   // public static async inviteUser(companyId: any, userId: any): Promise<IInvite> {
   //   return InviteApi.createOne({ company: companyId, user: userId });
   // }

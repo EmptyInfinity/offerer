@@ -1,6 +1,7 @@
 import { ForbiddenError, NotFoundError } from '../handlers/ApiError';
 import CompanyService from '../services/CompanyService';
 import UserService from '../services/UserService';
+import OfferService from '../services/OfferService';
 
 export default class Accessor {
   // companies route
@@ -20,22 +21,7 @@ export default class Accessor {
     }
   }
 
-  // public static canUserJoinCompany = async (companyId: any, userId: any) => {
-  //   // look for existing invite
-  //   if (!await this.isUserInCompany(companyId, userId)) throw new ForbiddenError('User already belongs company!');
-  // }
-
   public static canUserDeleteCompany = async (companyId: any, userId: any, isAdmin: boolean) => this.canUserUpdateCompany(companyId, userId, isAdmin);
-
-  public static canUserInviteToCompany = async (companyId: any, userId: any) => {
-    const isCompanyAdmin = await CompanyService.isUserCompanyAdmin(companyId, userId);
-    if (!isCompanyAdmin) {
-      if (await CompanyService.isExists(companyId)) {
-        throw new ForbiddenError();
-      }
-      throw new NotFoundError(`Company with id "${companyId}" is not found!`);
-    }
-  }
 
   // users route
   public static canUserCreateUser = (reqUserToken: string) => {
@@ -85,4 +71,49 @@ export default class Accessor {
   }
 
   public static canUserDeleteOffer = async (userId: any, companyId: any, isAdmin: boolean) => this.canUserUpdateOffer(userId, companyId, isAdmin);
+
+  // invites route
+  // public static canUserInviteUserToCompany = async (companyId: any, reqUserId: any, targetUserId: any) => {
+  //   const isCompanyAdmin = await CompanyService.isUserCompanyAdmin(companyId, reqUserId);
+  //   if (!isCompanyAdmin) {
+  //     if (await CompanyService.isExists(companyId)) {
+  //       throw new ForbiddenError();
+  //     }
+  //     throw new NotFoundError(`Company with id "${companyId}" is not found!`);
+  //   }
+  //   if (!await UserService.isExists(targetUserId)) {
+  //     throw new NotFoundError(`User with id "${targetUserId}" is not found!`);
+  //   }
+  // }
+
+  // public static canUserJoinCompanyByOffer = async (companyId: any, userId: any, offerId: any) => {
+  //   if (await CompanyService.isUserInCompany(companyId, userId)) throw new ForbiddenError('User already belongs company!');
+  //   if (!await OfferService.isExists(offerId)) throw new NotFoundError(`Offer with id "${offerId}" is not found!`);
+  // }
+
+  public static canUserInviteUserToCompanyByOffer = async (reqUserId: any, targetUserId: any, companyId: any, offerId: any) => {
+    const isCompanyAdmin = await CompanyService.isUserCompanyAdmin(companyId, reqUserId);
+    if (!isCompanyAdmin) {
+      if (await CompanyService.isExists(companyId)) {
+        throw new ForbiddenError();
+      }
+      throw new NotFoundError(`Company with id "${companyId}" is not found!`);
+    }
+    if (!await UserService.isExists(targetUserId)) {
+      throw new NotFoundError(`User with id "${targetUserId}" is not found!`);
+    }
+    if (!await OfferService.isExists(offerId)) {
+      throw new NotFoundError(`Offer with id "${offerId}" is not found!`);
+    }
+  }
+
+  public static canUserJoinCompanyByOffer = async (userId: any, companyId: any, offerId: any) => {
+    if (await CompanyService.isUserInCompany(companyId, userId)) throw new ForbiddenError('User already belongs company!');
+    if (!await CompanyService.isExists(companyId)) {
+      throw new NotFoundError(`Company with id "${companyId}" is not found!`);
+    }
+    if (!await OfferService.isExists(offerId)) {
+      throw new NotFoundError(`Offer with id "${offerId}" is not found!`);
+    }
+  }
 }

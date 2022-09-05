@@ -12,23 +12,23 @@ export default class OfferDbApi {
     return OfferModel.create(offerData).then((doc) => doc && doc.toObject());
   }
 
-  public static async getByIdInCompany(id: Types.ObjectId, companyId: Types.ObjectId): Promise<IOffer | null> {
-    return OfferModel.findOne({ _id: id, company: companyId }).then((doc) => doc && doc.toObject());
+  public static async getById(id: Types.ObjectId): Promise<IOffer | null> {
+    return OfferModel.findById(id).then((doc) => doc && doc.toObject());
   }
 
   public static async getAll(): Promise<IOffer[]> {
     return OfferModel.find().lean();
   }
 
-  public static async updateByIdInCompany(id: Types.ObjectId, offerData: IOffer, companyId: Types.ObjectId): Promise<IOffer | null> {
-    return OfferModel.findOneAndUpdate({ _id: id, company: companyId }, { $set: offerData }, { new: true }).then((doc) => doc && doc.toObject());
+  public static async updateById(id: Types.ObjectId, offerData: IOffer): Promise<IOffer | null> {
+    return OfferModel.findByIdAndUpdate(id, { $set: offerData }, { new: true }).then((doc) => doc && doc.toObject());
   }
 
-  public static async deleteByIdInCompany(id: Types.ObjectId, companyId: Types.ObjectId): Promise<IOffer | null> {
-    return OfferModel.findOneAndDelete({ _id: id, company: companyId }).then((doc) => doc && doc.toObject());
+  public static async deleteById(id: Types.ObjectId): Promise<IOffer | null> {
+    return OfferModel.findByIdAndDelete(id).then((doc) => doc && doc.toObject());
   }
 
-  public static async deleteAllByCompanyId(companyId: Types.ObjectId): Promise<any> {
+  public static async deleteAllInCompany(companyId: Types.ObjectId): Promise<any> {
     return OfferModel.deleteMany({ company: companyId });
   }
   /* CRUD END */

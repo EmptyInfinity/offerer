@@ -14,86 +14,148 @@ describe('inviteRoute', () => {
     server = request(await getApp());
   });
   describe('/POST', () => {
-    describe('/companies/:companyId/offers', () => {
-      it.only('should add invite', async () => {
+    describe('/companies/:companyId/invites', () => {
+      it('should add invite, inviter: company', async () => {
         const { user, token } = await UserService.createOne(formUser({}));
+        const { user: userToInvite } = await UserService.createOne({ name: 'us', email: 'user@email.com', password: 'secure' });
+
         const company = await CompanyService.createOne(formCompany({}) as any, user.id);
-        const offer = formOffer({});
+        const offer = await OfferService.createOne(formOffer({}) as any, company.id);
+        const invite = {
+          inviter: 'company',
+          userId: userToInvite.id,
+          offerId: offer.id,
+        };
 
-        const { body: resOffer, status } = await server.post(`/companies/${company.id}/invites`).set({ 'auth-token': token }).send(offer);
-        console.log(2, resOffer);
-
+        const { body: resInvite, status } = await server.post(`/companies/${company.id}/invites`).set({ 'auth-token': token }).send(invite);
         // response validation
-        // expect(status).to.be.equal(200);
-        // expect(resOffer).to.be.deep.equal({
-        //   ...offer,
-        //   id: resOffer.id,
-        //   company: company.id,
-        // });
+        expect(status).to.be.equal(200);
+        const { expireDate: dateInResponse } = resInvite;
+        delete resInvite.expireDate;
+        expect(resInvite).to.be.deep.equal({
+          ...invite,
+          id: resInvite.id,
+          company: company.id,
+        });
 
         // DB validation
-        // const offerInDb = await OfferService.getByIdInCompany(resOffer.id, company.id);
-        // expect(offerInDb).to.be.deep.equal(resOffer);
+        const inviteInDb = await InviteService.getById(resInvite.id);
+        const { expireDate: dateInDB } = inviteInDb;
+        delete inviteInDb.expireDate;
+        expect(dateInDB).to.be.instanceOf(Date);
+        expect(new Date(dateInDB).getTime()).to.be.equal(new Date(dateInResponse).getTime());
+        expect(inviteInDb).to.be.deep.equal(resInvite);
       });
-      it('should return error, admin can\'t create offers', async () => {
-        const { user } = await UserService.createOne(formUser({}));
-        const { token } = await UserService.createOne({
-          name: 'us', email: 'user@email.com', password: 'secure', isAdmin: true,
-        });
-        const company = await CompanyService.createOne(formCompany({}) as any, user.id);
-        const offer = formOffer({});
+      it('should add invite, inviter: user', async () => {
+        const { user: companyAdmin } = await UserService.createOne(formUser({}));
+        const { user, token } = await UserService.createOne({ name: 'us', email: 'user@email.com', password: 'secure' });
 
-        const { body, status } = await server.post(`/companies/${company.id}/offers`).set({ 'auth-token': token }).send(offer);
+        const company = await CompanyService.createOne(formCompany({}) as any, companyAdmin.id);
+        const offer = await OfferService.createOne(formOffer({}) as any, company.id);
+        const invite = {
+          inviter: 'user',
+          user: user.id,
+          offer: offer.id,
+        };
+
+        const { body: resInvite, status } = await server.post(`/companies/${company.id}/invites`).set({ 'auth-token': token }).send(invite);
+        // response validation
+        expect(status).to.be.equal(200);
+        const { expireDate: dateInResponse } = resInvite;
+        delete resInvite.expireDate;
+        expect(resInvite).to.be.deep.equal({
+          ...invite,
+          id: resInvite.id,
+          company: company.id,
+        });
+
+        // DB validation
+        const inviteInDb = await InviteService.getById(resInvite.id);
+        const { expireDate: dateInDB } = inviteInDb;
+        delete inviteInDb.expireDate;
+        expect(dateInDB).to.be.instanceOf(Date);
+        expect(new Date(dateInDB).getTime()).to.be.equal(new Date(dateInResponse).getTime());
+        expect(inviteInDb).to.be.deep.equal(resInvite);
+      });
+      it('should return error, only company admin can invite users', async () => {
+        const { user } = await UserService.createOne(formUser({}));
+        const { token: notCompanyAdminToken } = await UserService.createOne({
+          name: 'us1', email: 'user2@email.com', password: 'secure', admin: true,
+        });
+        const { user: userToInvite } = await UserService.createOne({ name: 'us', email: 'user@email.com', password: 'secure' });
+        const company = await CompanyService.createOne(formCompany({}) as any, user.id);
+        const offer = await OfferService.createOne(formOffer({}) as any, company.id);
+        const invite = {
+          inviter: 'company',
+          user: userToInvite.id,
+          offer: offer.id,
+        };
+
+        const { body, status } = await server.post(`/companies/${company.id}/invites`).set({ 'auth-token': notCompanyAdminToken }).send(invite);
         // response validation
         expect(status).to.be.equal(403);
         expect(body.message).to.be.equal('Permission denied');
 
         // DB validation
-        const offerInDb = await OfferService.getAll();
-        expect(offerInDb).to.be.deep.equal([]);
+        const invitesInDb = await InviteService.getAll();
+        expect(invitesInDb).to.be.deep.equal([]);
       });
-      it('should return error, only company admin can create offers', async () => {
+      it('should return error, only company admin can invite users', async () => {
         const { user } = await UserService.createOne(formUser({}));
-        const { token } = await UserService.createOne({
-          name: 'us', email: 'user@email.com', password: 'secure',
+        const { token: notCompanyAdminToken } = await UserService.createOne({
+          name: 'us1', email: 'user2@email.com', password: 'secure',
         });
+        const { user: userToInvite } = await UserService.createOne({ name: 'us', email: 'user@email.com', password: 'secure' });
         const company = await CompanyService.createOne(formCompany({}) as any, user.id);
-        const offer = formOffer({});
+        const offer = await OfferService.createOne(formOffer({}) as any, company.id);
+        const invite = {
+          inviter: 'company',
+          user: userToInvite.id,
+          offer: offer.id,
+        };
 
-        const { body, status } = await server.post(`/companies/${company.id}/offers`).set({ 'auth-token': token }).send(offer);
+        const { body, status } = await server.post(`/companies/${company.id}/invites`).set({ 'auth-token': notCompanyAdminToken }).send(invite);
         // response validation
         expect(status).to.be.equal(403);
         expect(body.message).to.be.equal('Permission denied');
 
         // DB validation
-        const offerInDb = await OfferService.getAll();
-        expect(offerInDb).to.be.deep.equal([]);
+        const invitesInDb = await InviteService.getAll();
+        expect(invitesInDb).to.be.deep.equal([]);
       });
       it('should throw error, missing required field', async () => {
         const { user, token } = await UserService.createOne(formUser({}));
         const company = await CompanyService.createOne(formCompany({}) as any, user.id);
 
-        const { body, status } = await server.post(`/companies/${company.id}/offers`).set({ 'auth-token': token }).send({});
+        const { body, status } = await server.post(`/companies/${company.id}/invites`).set({ 'auth-token': token }).send({});
         // response validation
         expect(status).to.be.equal(400);
-        expect(body.message).to.be.equal('"name" is required');
+        expect(body.message).to.be.equal('"offer" is required');
 
         // DB validation
-        const offerInDb = await OfferService.getAll();
-        expect(offerInDb.length).to.be.equal(0);
+        const invitesInDb = await InviteService.getAll();
+        expect(invitesInDb.length).to.be.equal(0);
       });
       it('should throw error, extra field', async () => {
         const { user, token } = await UserService.createOne(formUser({}));
-        const company = await CompanyService.createOne(formCompany({}) as any, user.id);
+        const { user: userToInvite } = await UserService.createOne({ name: 'us', email: 'user@email.com', password: 'secure' });
 
-        const { body, status } = await server.post(`/companies/${company.id}/offers`).set({ 'auth-token': token }).send({ ...formOffer({}), a: 22 });
+        const company = await CompanyService.createOne(formCompany({}) as any, user.id);
+        const offer = await OfferService.createOne(formOffer({}) as any, company.id);
+        const invite = {
+          inviter: 'company',
+          user: userToInvite.id,
+          offer: offer.id,
+        };
+
+        const { body, status } = await server.post(`/companies/${company.id}/invites`).set({ 'auth-token': token }).send({ ...invite, a: 22 });
         // response validation
         expect(status).to.be.equal(400);
         expect(body.message).to.be.equal('"a" is not allowed');
 
         // DB validation
-        const offerInDb = await OfferService.getAll();
-        expect(offerInDb.length).to.be.equal(0);
+        const invitesInDb = await InviteService.getAll();
+        expect(invitesInDb.length).to.be.equal(0);
       });
     });
   });
@@ -110,7 +172,7 @@ describe('inviteRoute', () => {
         expect(resOffer).to.be.deep.equal({ ...offer, name: 'new name' });
 
         // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(resOffer.id, company.id);
+        const offerInDb = await OfferService.getById(resOffer.id);
         expect(offerInDb).to.be.deep.equal(resOffer);
       });
       it('should update offer (as admin)', async () => {
@@ -127,7 +189,7 @@ describe('inviteRoute', () => {
         expect(resOffer).to.be.deep.equal({ ...offer, name: 'new name' });
 
         // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(resOffer.id, company.id);
+        const offerInDb = await OfferService.getById(resOffer.id);
         expect(offerInDb).to.be.deep.equal(resOffer);
       });
       it('should throw error, not company admin', async () => {
@@ -142,7 +204,7 @@ describe('inviteRoute', () => {
         expect(body.message).to.be.equal('Permission denied');
 
         // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(offer.id, company.id);
+        const offerInDb = await OfferService.getById(offer.id);
         expect(offerInDb.name).to.be.equal(offer.name);
       });
       it('should throw error, company is not found', async () => {
@@ -157,7 +219,7 @@ describe('inviteRoute', () => {
         expect(body.message).to.be.equal(`Company with id "${nonExistingId}" is not found!`);
 
         // // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(offer.id, company.id);
+        const offerInDb = await OfferService.getById(offer.id);
         expect(offerInDb.name).to.be.equal(offer.name);
       });
       it('should throw error, offer is not found', async () => {
@@ -172,7 +234,7 @@ describe('inviteRoute', () => {
         expect(body.message).to.be.equal(`Offer with id "${nonExistingId}" is not found!`);
 
         // // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(offer.id, company.id);
+        const offerInDb = await OfferService.getById(offer.id);
         expect(offerInDb.name).to.be.equal(offer.name);
       });
       it('should throw error, extra field', async () => {
@@ -186,7 +248,7 @@ describe('inviteRoute', () => {
         expect(body.message).to.be.equal('"a" is not allowed');
 
         // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(offer.id, company.id);
+        const offerInDb = await OfferService.getById(offer.id);
         expect(offerInDb).to.be.deep.equal(offer);
       });
     });
@@ -266,7 +328,7 @@ describe('inviteRoute', () => {
         expect(status).to.be.equal(403);
         expect(body.message).to.be.equal('Permission denied');
         // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(offer.id, company.id);
+        const offerInDb = await OfferService.getById(offer.id);
         expect(offerInDb).to.be.deep.equal(offer);
       });
       it('should return error (company not found)', async () => {
@@ -290,7 +352,7 @@ describe('inviteRoute', () => {
         // response validation
         expect(status).to.be.equal(404);
         expect(body.message).to.be.equal(`Offer with id "${nonExistingId}" is not found!`);
-        const offerInDb = await OfferService.getByIdInCompany(offer.id, company.id);
+        const offerInDb = await OfferService.getById(offer.id);
         expect(offerInDb).to.be.deep.equal(offer);
       });
     });

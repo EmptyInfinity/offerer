@@ -29,7 +29,7 @@ describe('offerRoute', () => {
         });
 
         // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(resOffer.id, company.id);
+        const offerInDb = await OfferService.getById(resOffer.id);
         expect(offerInDb).to.be.deep.equal(resOffer);
       });
       it('should return error, admin can\'t create offers', async () => {
@@ -107,7 +107,7 @@ describe('offerRoute', () => {
         expect(resOffer).to.be.deep.equal({ ...offer, name: 'new name' });
 
         // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(resOffer.id, company.id);
+        const offerInDb = await OfferService.getById(resOffer.id);
         expect(offerInDb).to.be.deep.equal(resOffer);
       });
       it('should update offer (as admin)', async () => {
@@ -124,7 +124,7 @@ describe('offerRoute', () => {
         expect(resOffer).to.be.deep.equal({ ...offer, name: 'new name' });
 
         // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(resOffer.id, company.id);
+        const offerInDb = await OfferService.getById(resOffer.id);
         expect(offerInDb).to.be.deep.equal(resOffer);
       });
       it('should throw error, not company admin', async () => {
@@ -139,7 +139,7 @@ describe('offerRoute', () => {
         expect(body.message).to.be.equal('Permission denied');
 
         // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(offer.id, company.id);
+        const offerInDb = await OfferService.getById(offer.id);
         expect(offerInDb.name).to.be.equal(offer.name);
       });
       it('should throw error, company is not found', async () => {
@@ -154,7 +154,7 @@ describe('offerRoute', () => {
         expect(body.message).to.be.equal(`Company with id "${nonExistingId}" is not found!`);
 
         // // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(offer.id, company.id);
+        const offerInDb = await OfferService.getById(offer.id);
         expect(offerInDb.name).to.be.equal(offer.name);
       });
       it('should throw error, offer is not found', async () => {
@@ -169,7 +169,7 @@ describe('offerRoute', () => {
         expect(body.message).to.be.equal(`Offer with id "${nonExistingId}" is not found!`);
 
         // // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(offer.id, company.id);
+        const offerInDb = await OfferService.getById(offer.id);
         expect(offerInDb.name).to.be.equal(offer.name);
       });
       it('should throw error, extra field', async () => {
@@ -183,7 +183,7 @@ describe('offerRoute', () => {
         expect(body.message).to.be.equal('"a" is not allowed');
 
         // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(offer.id, company.id);
+        const offerInDb = await OfferService.getById(offer.id);
         expect(offerInDb).to.be.deep.equal(offer);
       });
     });
@@ -208,16 +208,6 @@ describe('offerRoute', () => {
         const { body, status } = await server.get(`/companies/${company.id}/offers/${nonExistingId}`).set({ 'auth-token': token });
         expect(status).to.be.equal(404);
         expect(body.message).to.be.equal(`Offer with id "${nonExistingId}" is not found!`);
-      });
-      it('should return error (company not found)', async () => {
-        const { user, token } = await UserService.createOne(formUser({}));
-        const company = await CompanyService.createOne(formCompany({}) as any, user.id);
-        const offer = await OfferService.createOne(formOffer({}) as any, company.id);
-
-        const nonExistingId = '630473adaa90421c7c073d6e';
-        const { body, status } = await server.get(`/companies/${nonExistingId}/offers/${offer.id}`).set({ 'auth-token': token });
-        expect(status).to.be.equal(404);
-        expect(body.message).to.be.equal(`Company with id "${nonExistingId}" is not found!`);
       });
     });
   });
@@ -263,7 +253,7 @@ describe('offerRoute', () => {
         expect(status).to.be.equal(403);
         expect(body.message).to.be.equal('Permission denied');
         // DB validation
-        const offerInDb = await OfferService.getByIdInCompany(offer.id, company.id);
+        const offerInDb = await OfferService.getById(offer.id);
         expect(offerInDb).to.be.deep.equal(offer);
       });
       it('should return error (company not found)', async () => {
@@ -287,7 +277,7 @@ describe('offerRoute', () => {
         // response validation
         expect(status).to.be.equal(404);
         expect(body.message).to.be.equal(`Offer with id "${nonExistingId}" is not found!`);
-        const offerInDb = await OfferService.getByIdInCompany(offer.id, company.id);
+        const offerInDb = await OfferService.getById(offer.id);
         expect(offerInDb).to.be.deep.equal(offer);
       });
     });

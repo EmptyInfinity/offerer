@@ -30,6 +30,6 @@ export interface IInvite {
   inviter: 'user' | 'company'
   offer: any | IOffer
   user: any | IUser
+  company: any | ICompany
   expireDate: Date
-  createdAt: Date
 }

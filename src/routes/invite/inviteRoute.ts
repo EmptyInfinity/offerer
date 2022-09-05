@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { ForbiddenError, NotFoundError } from '../../handlers/ApiError';
 import Accessor from '../../helpers/Accessor';
 import { SuccessResponse } from '../../handlers/ApiResponse';
 import CompanyService from '../../services/CompanyService';
@@ -9,6 +10,7 @@ import schema from './inviteSchema';
 import asyncHandler from '../../helpers/asyncHandler';
 import { ICompany } from '../../databases/interfaces';
 import verifyToken from '../../helpers/verifyToken';
+import UserService from '../../services/UserService';
 
 const router = express.Router({ mergeParams: true });
 
@@ -16,50 +18,58 @@ const router = express.Router({ mergeParams: true });
 router.post(
   '/',
   verifyToken,
-  // validator(schema.post, ValidationSource.BODY),
+  validator(schema.post, ValidationSource.BODY),
   asyncHandler(async (req: Request, res: Response) => {
-    console.log(1, req.params, req.body, req.url);
-    // const [userId, companyId] = [req.user.id, req.params.companyId];
-    // await Accessor.canUserCreateOffer(userId, companyId);
-    // const offer = await OfferService.createOne(req.body, companyId);
-    return SuccessResponse(res, 200, {});
+    const [reqUserId, companyId, targetUserId] = [req.user.id, req.params.companyId, req.body.user];
+    const { inviter, offerId } = req.body;
+    // if (inviter === 'company') {
+    //   await Accessor.canUserInviteUserToCompany(companyId, reqUserId, targetUserId);
+    // } else if (!await CompanyService.isExists(companyId)) throw new NotFoundError(`Company with id "${companyId}" is not found!`);
+    // await Accessor.canUserJoinCompanyByOffer(targetUserId, companyId, offerId);
+    if (inviter === 'company') {
+      await Accessor.canUserInviteUserToCompanyByOffer(reqUserId, targetUserId, companyId, offerId);
+    } else {
+      await Accessor.canUserJoinCompanyByOffer(targetUserId, companyId, offerId);
+    }
+    const invite = await InviteService.createOne(req.body, companyId);
+    return SuccessResponse(res, 200, invite);
   }),
 );
 
-router.get(
-  '/:id',
-  validator(null, ValidationSource.PARAM),
-  asyncHandler(async (req: Request, res: Response) => {
-    const [offerId, companyId] = [req.params.id, req.params.companyId];
-    const offer = await OfferService.getByIdInCompany(offerId, companyId);
-    return SuccessResponse(res, 200, offer);
-  }),
-);
+// router.get(
+//   '/:id',
+//   validator(null, ValidationSource.PARAM),
+//   asyncHandler(async (req: Request, res: Response) => {
+//     const [offerId, companyId] = [req.params.id, req.params.companyId];
+//     const offer = await OfferService.getByIdInCompany(offerId, companyId);
+//     return SuccessResponse(res, 200, offer);
+//   }),
+// );
 
-router.put(
-  '/:id',
-  verifyToken,
-  validator(null, ValidationSource.PARAM),
-  validator(schema.put, ValidationSource.BODY),
-  asyncHandler(async (req: Request, res: Response) => {
-    const [userId, companyId, offerId, isAdmin] = [req.user.id, req.params.companyId, req.params.id, req.user.isAdmin];
-    await Accessor.canUserUpdateOffer(userId, companyId, isAdmin);
-    const updatedOffer = await OfferService.updateByIdInCompany(offerId, req.body, companyId);
-    return SuccessResponse(res, 200, updatedOffer);
-  }),
-);
+// router.put(
+//   '/:id',
+//   verifyToken,
+//   validator(null, ValidationSource.PARAM),
+//   validator(schema.put, ValidationSource.BODY),
+//   asyncHandler(async (req: Request, res: Response) => {
+//     const [userId, companyId, offerId, isAdmin] = [req.user.id, req.params.companyId, req.params.id, req.user.isAdmin];
+//     await Accessor.canUserUpdateOffer(userId, companyId, isAdmin);
+//     const updatedOffer = await OfferService.updateByIdInCompany(offerId, req.body, companyId);
+//     return SuccessResponse(res, 200, updatedOffer);
+//   }),
+// );
 
-router.delete(
-  '/:id',
-  verifyToken,
-  validator(null, ValidationSource.PARAM),
-  asyncHandler(async (req: Request, res: Response) => {
-    const [userId, companyId, offerId, isAdmin] = [req.user.id, req.params.companyId, req.params.id, req.user.isAdmin];
-    await Accessor.canUserDeleteOffer(userId, companyId, isAdmin);
-    const deletedOffer = await OfferService.deleteByIdInCompany(offerId, companyId);
-    return SuccessResponse(res, 200, deletedOffer);
-  }),
-);
+// router.delete(
+//   '/:id',
+//   verifyToken,
+//   validator(null, ValidationSource.PARAM),
+//   asyncHandler(async (req: Request, res: Response) => {
+//     const [userId, companyId, offerId, isAdmin] = [req.user.id, req.params.companyId, req.params.id, req.user.isAdmin];
+//     await Accessor.canUserDeleteOffer(userId, companyId, isAdmin);
+//     const deletedOffer = await OfferService.deleteByIdInCompany(offerId, companyId);
+//     return SuccessResponse(res, 200, deletedOffer);
+//   }),
+// );
 /* CRUD END */
 
 export default router;

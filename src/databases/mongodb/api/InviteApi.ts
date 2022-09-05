@@ -8,8 +8,8 @@ export default class CompanyInvoiceDbApi {
   }
 
   /* CRUD */
-  public static async createOne(offerId: Types.ObjectId, userId: Types.ObjectId, inviter: 'user' | 'company'): Promise<IInvite> {
-    return InviteModel.create({ offer: offerId, user: userId, inviter }).then((doc) => doc && doc.toObject());
+  public static async createOne(offerData: IInvite): Promise<IInvite> {
+    return InviteModel.create(offerData).then((doc) => doc && doc.toObject());
   }
 
   public static async getById(id: Types.ObjectId): Promise<IInvite | null> {

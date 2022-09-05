@@ -23,6 +23,11 @@ const schema = new Schema(
       ref: 'User',
       required: true,
     },
+    company: {
+      type: Schema.Types.ObjectId,
+      ref: 'Company',
+      required: true,
+    },
     expireDate: {
       type: Types.Date,
       require: true,
@@ -30,7 +35,6 @@ const schema = new Schema(
   },
   {
     versionKey: false,
-    timestamps: { createdAt: true, updatedAt: false },
   },
 );
 
@@ -41,6 +45,7 @@ schema.options.toObject.transform = function (doc, obj, options) {
   obj.id = obj._id.toString();
   obj.offer = obj.offer.toString();
   obj.user = obj.user.toString();
+  obj.company = obj.company.toString();
   delete obj._id;
   return obj;
 };

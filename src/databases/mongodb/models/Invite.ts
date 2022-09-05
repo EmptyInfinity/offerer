@@ -23,14 +23,31 @@ const schema = new Schema(
       ref: 'User',
       required: true,
     },
+    company: {
+      type: Schema.Types.ObjectId,
+      ref: 'Company',
+      required: true,
+    },
+    expireDate: {
+      type: Types.Date,
+      require: true,
+    },
   },
   {
     versionKey: false,
   },
 );
-schema.set('toJSON', {
-  virtuals: true,
-  transform(doc, ret) { delete ret._id; },
-});
+
+// @ts-ignore
+if (!schema.options.toObject) schema.options.toObject = {};
+// @ts-ignore
+schema.options.toObject.transform = function (doc, obj, options) {
+  obj.id = obj._id.toString();
+  obj.offer = obj.offer.toString();
+  obj.user = obj.user.toString();
+  obj.company = obj.company.toString();
+  delete obj._id;
+  return obj;
+};
 
 export const InviteModel = model<InviteDocument>(DOCUMENT_NAME, schema, COLLECTION_NAME);

@@ -11,6 +11,5 @@ export default {
   put: Joi.object().keys({
     name: Joi.string().min(2).max(100).trim(),
     link: Joi.string().uri().max(100).trim(),
-    employees: Joi.array().items(JoiValidId()),
   }),
 };

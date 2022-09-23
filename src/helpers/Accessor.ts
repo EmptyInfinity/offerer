@@ -99,4 +99,16 @@ export default class Accessor {
       throw new NotFoundError(`Offer with id "${offerId}" is not found!`);
     }
   }
+
+  public static canUserGetInvite = async (reqUserId: any, inviteUserId: any, companyId: any) => {
+    if (reqUserId !== inviteUserId) {
+      const isCompanyAdmin = await CompanyService.isUserCompanyAdmin(companyId, reqUserId);
+      if (!isCompanyAdmin) {
+        if (await CompanyService.isExists(companyId)) {
+          throw new ForbiddenError();
+        }
+        throw new NotFoundError(`Company with id "${companyId}" is not found!`);
+      }
+    }
+  }
 }

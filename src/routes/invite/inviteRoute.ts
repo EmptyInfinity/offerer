@@ -32,28 +32,15 @@ router.post(
   }),
 );
 
-// router.get(
-//   '/:id',
-//   validator(null, ValidationSource.PARAM),
-//   asyncHandler(async (req: Request, res: Response) => {
-//     const [offerId, companyId] = [req.params.id, req.params.companyId];
-//     const offer = await OfferService.getByIdInCompany(offerId, companyId);
-//     return SuccessResponse(res, 200, offer);
-//   }),
-// );
-
-// router.put(
-//   '/:id',
-//   verifyToken,
-//   validator(null, ValidationSource.PARAM),
-//   validator(schema.put, ValidationSource.BODY),
-//   asyncHandler(async (req: Request, res: Response) => {
-//     const [userId, companyId, offerId, isAdmin] = [req.user.id, req.params.companyId, req.params.id, req.user.isAdmin];
-//     await Accessor.canUserUpdateOffer(userId, companyId, isAdmin);
-//     const updatedOffer = await OfferService.updateByIdInCompany(offerId, req.body, companyId);
-//     return SuccessResponse(res, 200, updatedOffer);
-//   }),
-// );
+router.get(
+  '/:id',
+  validator(null, ValidationSource.PARAM),
+  asyncHandler(async (req: Request, res: Response) => {
+    const invite = await InviteService.getById(req.params.id);
+    await Accessor.canUserGetInvite(req.user.id, invite.user, req.params.companyId);
+    return SuccessResponse(res, 200, invite);
+  }),
+);
 
 // router.delete(
 //   '/:id',
